@@ -1041,3 +1041,637 @@ tr:last-child td {
         width: 100%;
     }
 }
+
+
+/* =========================
+   ADMIN DASHBOARD - NEW
+========================= */
+
+.admin-dashboard {
+    min-height: 80vh;
+    padding-bottom: 70px;
+}
+
+
+/* Dashboard Header */
+
+.admin-dashboard .dashboard-header {
+    padding: 50px 7%;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 30px;
+
+    background: #fff3e8;
+}
+
+.admin-dashboard .dashboard-header h1 {
+    font-size: 36px;
+    margin-bottom: 8px;
+}
+
+.admin-dashboard .dashboard-header p {
+    color: #666;
+}
+
+
+/* Year Selector */
+
+.year-selector {
+    min-width: 200px;
+}
+
+.year-selector label {
+    display: block;
+    margin-bottom: 8px;
+
+    font-weight: 600;
+}
+
+.year-selector select {
+    width: 100%;
+
+    padding: 12px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 8px;
+
+    background: white;
+
+    font-size: 15px;
+
+    cursor: pointer;
+}
+
+
+/* Dashboard Summary */
+
+.admin-dashboard .summary-cards {
+    max-width: 1200px;
+
+    margin: 40px auto;
+
+    padding: 0 7%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 20px;
+}
+
+
+.admin-dashboard .summary-card {
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 3px 15px
+        rgba(0, 0, 0, 0.08);
+
+    text-align: center;
+
+    transition: 0.3s;
+}
+
+
+.admin-dashboard .summary-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 7px 20px
+        rgba(0, 0, 0, 0.12);
+}
+
+
+.admin-dashboard .summary-card h3 {
+    font-size: 15px;
+
+    color: #666;
+
+    margin-bottom: 12px;
+}
+
+
+.admin-dashboard .summary-card p {
+    font-size: 25px;
+
+    font-weight: bold;
+
+    color: #ff6b00;
+}
+
+
+/* Dashboard Sections */
+
+.admin-dashboard .dashboard-section {
+    max-width: 1200px;
+
+    margin: auto;
+
+    padding: 30px 7%;
+}
+
+
+.admin-dashboard .dashboard-section h2 {
+    text-align: left;
+
+    margin-bottom: 20px;
+}
+
+
+/* Section Header */
+
+.section-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 20px;
+}
+
+
+.section-header h2 {
+    margin: 0 !important;
+}
+
+
+.section-header a {
+    color: #ff6b00;
+
+    font-weight: 600;
+}
+
+
+.section-header a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================
+   QUICK ACTIONS
+========================= */
+
+.admin-dashboard .action-grid {
+    max-width: none;
+
+    margin: 0;
+
+    padding: 0;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+}
+
+
+.admin-dashboard .action-card {
+    min-height: 190px;
+}
+
+
+/* =========================
+   DONATION STATUS
+========================= */
+
+.status {
+    display: inline-block;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    text-transform: capitalize;
+}
+
+
+/* Pending */
+
+.status.pending {
+    background: #fff3cd;
+
+    color: #856404;
+}
+
+
+/* Confirmed */
+
+.status.confirmed {
+    background: #d4edda;
+
+    color: #155724;
+}
+
+
+/* Rejected */
+
+.status.rejected {
+    background: #f8d7da;
+
+    color: #721c24;
+}
+
+
+/* =========================
+   DONATION MANAGEMENT
+========================= */
+
+.donation-controls {
+    flex-wrap: wrap;
+}
+
+
+.status-filter {
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.status-filter label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-weight: 600;
+}
+
+
+.status-filter select {
+    min-width: 200px;
+
+    padding: 12px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 8px;
+
+    background: white;
+
+    font-size: 15px;
+
+    cursor: pointer;
+}
+
+
+/* Donation Summary */
+
+.donation-summary {
+    max-width: 1100px;
+
+    margin: 30px auto;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 20px;
+}
+
+
+.donation-summary-card {
+    background: white;
+
+    padding: 20px;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 3px 15px
+        rgba(0, 0, 0, 0.08);
+
+    text-align: center;
+}
+
+
+.donation-summary-card span {
+    display: block;
+
+    color: #666;
+
+    font-size: 14px;
+
+    margin-bottom: 8px;
+}
+
+
+.donation-summary-card strong {
+    font-size: 24px;
+
+    color: #ff6b00;
+}
+
+
+/* =========================
+   VERIFY / REJECT BUTTONS
+========================= */
+
+.verify-btn,
+.reject-btn {
+    border: none;
+
+    padding: 8px 12px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    font-size: 13px;
+
+    margin: 2px;
+
+    transition: 0.2s;
+}
+
+
+.verify-btn {
+    background: #e8f5e9;
+
+    color: #2e7d32;
+}
+
+
+.verify-btn:hover {
+    background: #c8e6c9;
+
+    transform: translateY(-1px);
+}
+
+
+.reject-btn {
+    background: #ffebee;
+
+    color: #c62828;
+}
+
+
+.reject-btn:hover {
+    background: #ffcdd2;
+
+    transform: translateY(-1px);
+}
+
+
+/* Published */
+
+.published-status {
+    display: inline-block;
+
+    padding: 6px 10px;
+
+    border-radius: 5px;
+
+    background: #e8f5e9;
+
+    color: #2e7d32;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    margin: 2px;
+}
+
+
+/* Rejected */
+
+.rejected-status {
+    display: inline-block;
+
+    padding: 6px 10px;
+
+    border-radius: 5px;
+
+    background: #ffebee;
+
+    color: #c62828;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    margin: 2px;
+}
+
+
+/* =========================
+   DONATION EDIT FORM
+========================= */
+
+#editDonationSection {
+    max-width: 700px;
+
+    margin: 40px auto;
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 5px 20px
+        rgba(0, 0, 0, 0.08);
+}
+
+
+#editDonationSection h2 {
+    margin-bottom: 25px;
+
+    text-align: center;
+}
+
+
+#editDonationForm {
+    display: grid;
+
+    gap: 15px;
+}
+
+
+#editDonationForm input,
+#editDonationForm select {
+    width: 100%;
+
+    padding: 12px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 7px;
+
+    font-size: 15px;
+
+    background: white;
+}
+
+
+#editDonationForm input:focus,
+#editDonationForm select:focus {
+    outline: none;
+
+    border-color: #ff6b00;
+}
+
+
+#editDonationForm button {
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #ff6b00;
+
+    color: white;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+#editDonationForm button:hover {
+    background: #e55f00;
+}
+
+
+#editDonationForm #cancelEditBtn {
+    background: #eee;
+
+    color: #333;
+}
+
+
+#editDonationForm #cancelEditBtn:hover {
+    background: #ddd;
+}
+
+
+/* =========================
+   ADMIN TABLE ACTIONS
+========================= */
+
+td:last-child {
+    white-space: normal;
+}
+
+
+/* =========================
+   ADMIN DASHBOARD MOBILE
+========================= */
+
+@media (max-width: 900px) {
+
+    .admin-dashboard .summary-cards {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .admin-dashboard .action-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .donation-summary {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 768px) {
+
+    .admin-dashboard .dashboard-header {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        padding: 40px 20px;
+    }
+
+
+    .admin-dashboard .dashboard-header h1 {
+        font-size: 28px;
+    }
+
+
+    .admin-dashboard .summary-cards {
+        padding: 0 20px;
+
+        grid-template-columns: 1fr;
+
+        margin: 25px auto;
+    }
+
+
+    .admin-dashboard .action-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .admin-dashboard .dashboard-section {
+        padding: 25px 20px;
+    }
+
+
+    .donation-controls {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
+    .donation-controls > * {
+        width: 100%;
+    }
+
+
+    .status-filter select {
+        width: 100%;
+    }
+
+
+    .donation-summary {
+        grid-template-columns: 1fr;
+
+        margin: 20px;
+    }
+
+
+    .verify-btn,
+    .reject-btn,
+    .edit-btn,
+    .delete-btn {
+        display: block;
+
+        width: 100%;
+
+        margin: 4px 0;
+    }
+
+
+    #editDonationSection {
+        margin: 25px 20px;
+
+        padding: 20px;
+    }
+
+}

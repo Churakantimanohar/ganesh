@@ -163,6 +163,65 @@
                     </tbody>
 
                 </table>
+                <div id="editExpenseSection" style="display: none;">
+
+    <h2>Edit Expense</h2>
+
+    <form id="editExpenseForm">
+
+        <input
+            type="text"
+            id="editExpenseName"
+            placeholder="Expense name"
+            required
+        >
+
+        <input
+            type="text"
+            id="editCategory"
+            placeholder="Category"
+            required
+        >
+
+        <input
+            type="number"
+            id="editAmount"
+            placeholder="Amount"
+            min="1"
+            required
+        >
+
+        <input
+            type="text"
+            id="editDescription"
+            placeholder="Description"
+        >
+
+        <select id="editFestivalYear" required>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+            <option value="2028">2028</option>
+        </select>
+
+        <input
+            type="date"
+            id="editExpenseDate"
+            required
+        >
+
+        <button type="submit">
+            Update Expense
+        </button>
+
+        <button
+            type="button"
+            id="cancelEditBtn">
+            Cancel
+        </button>
+
+    </form>
+
+</div>
 
             </div>
 

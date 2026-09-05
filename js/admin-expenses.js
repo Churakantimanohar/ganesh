@@ -184,37 +184,25 @@ expenseForm.addEventListener("submit", async (event) => {
         };
 
 
-        const expenseRef = await addDoc(
-            collection(db, "expenses"),
-            expenseData
-        );
+      const expenseRef = await addDoc(
+    collection(db, "expenses"),
+    expenseData
+);
 
+const publicExpenseData = {
+    privateExpenseId: expenseRef.id,
+    title,
+    category: expenseCategory,
+    amount: expenseAmount,
+    description: expenseDescription,
+    festivalYear: year,
+    date: new Date(selectedDate)
+};
 
-        // ===============================
-        // CREATE PUBLIC EXPENSE
-        // ===============================
-
-        const publicExpenseData = {
-
-            title: title,
-
-            category: expenseCategory,
-
-            amount: expenseAmount,
-
-            description: expenseDescription,
-
-            festivalYear: year,
-
-            date: new Date(selectedDate)
-
-        };
-
-
-        await addDoc(
-            collection(db, "publicExpenses"),
-            publicExpenseData
-        );
+await addDoc(
+    collection(db, "publicExpenses"),
+    publicExpenseData
+);
 
 
         // ===============================

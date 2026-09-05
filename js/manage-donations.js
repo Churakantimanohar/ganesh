@@ -1,29 +1,31 @@
 import { auth, db } from "./firebase-config.js";
 
 import {
-    onAuthStateChanged,
-    signOut
+    onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 import {
-    doc,
-    getDoc,
     collection,
-    getDocs,
     query,
     where,
+    getDocs,
+    doc,
+    getDoc,
+    runTransaction,
     updateDoc,
-    addDoc,
-    runTransaction
+    setDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
-// =========================================
-// HTML Elements
-// =========================================
+// =================================
+// ELEMENTS
+// =================================
 
 const festivalYear =
     document.getElementById("festivalYear");
+
+const statusFilter =
+    document.getElementById("statusFilter");
 
 const donationTableBody =
     document.getElementById("donationTableBody");
@@ -31,13 +33,54 @@ const donationTableBody =
 const totalDonations =
     document.getElementById("totalDonations");
 
-const logoutBtn =
-    document.getElementById("logoutBtn");
+const confirmedTotal =
+    document.getElementById("confirmedTotal");
+
+const pendingTotal =
+    document.getElementById("pendingTotal");
 
 
-// =========================================
+// =================================
+// EDIT ELEMENTS
+// =================================
+
+const editDonationSection =
+    document.getElementById("editDonationSection");
+
+const editDonationForm =
+    document.getElementById("editDonationForm");
+
+const editDonorName =
+    document.getElementById("editDonorName");
+
+const editDonationAmount =
+    document.getElementById("editDonationAmount");
+
+const editPaymentMethod =
+    document.getElementById("editPaymentMethod");
+
+const editFestivalYear =
+    document.getElementById("editFestivalYear");
+
+const editDonationDate =
+    document.getElementById("editDonationDate");
+
+const cancelEditBtn =
+    document.getElementById("cancelEditBtn");
+
+
+// =================================
+// VARIABLES
+// =================================
+
+let allDonations = [];
+
+let editingDonationId = null;
+
+
+// =================================
 // CHECK ADMIN
-// =========================================
+// =================================
 
 onAuthStateChanged(auth, async (user) => {
 
@@ -59,18 +102,13 @@ onAuthStateChanged(auth, async (user) => {
                 user.uid
             );
 
-
-        const userSnap =
+        const userSnapshot =
             await getDoc(userRef);
 
 
-        if (!userSnap.exists()) {
+        if (!userSnapshot.exists()) {
 
-            alert(
-                "User profile not found."
-            );
-
-            await signOut(auth);
+            await auth.signOut();
 
             window.location.href =
                 "../login.html";
@@ -80,7 +118,7 @@ onAuthStateChanged(auth, async (user) => {
 
 
         const userData =
-            userSnap.data();
+            userSnapshot.data();
 
 
         if (userData.role !== "admin") {
@@ -96,9 +134,7 @@ onAuthStateChanged(auth, async (user) => {
         }
 
 
-        loadDonations(
-            festivalYear.value
-        );
+        loadDonations();
 
 
     } catch (error) {
@@ -108,77 +144,50 @@ onAuthStateChanged(auth, async (user) => {
             error
         );
 
+        alert(
+            "Unable to verify admin access."
+        );
+
         window.location.href =
             "../dashboard.html";
-
     }
 
 });
 
 
-// =========================================
+// =================================
 // LOAD DONATIONS
-// =========================================
+// =================================
 
-async function loadDonations(year) {
-
-    donationTableBody.innerHTML = `
-        <tr>
-            <td colspan="7">
-                Loading donations...
-            </td>
-        </tr>
-    `;
-
+async function loadDonations() {
 
     try {
 
-        const donationQuery =
+        const selectedYear =
+            festivalYear.value;
+
+
+        const donationsQuery =
             query(
                 collection(
                     db,
                     "donations"
                 ),
-
                 where(
                     "festivalYear",
                     "==",
-                    year
+                    selectedYear
                 )
             );
 
 
         const snapshot =
             await getDocs(
-                donationQuery
+                donationsQuery
             );
 
 
-        donationTableBody.innerHTML =
-            "";
-
-
-        let total = 0;
-
-
-        if (snapshot.empty) {
-
-            donationTableBody.innerHTML = `
-                <tr>
-                    <td colspan="7">
-                        No donations found.
-                    </td>
-                </tr>
-            `;
-
-            totalDonations.textContent =
-                "₹0";
-
-            return;
-        }
-
-
-        const donations = [];
+        allDonations = [];
 
 
         snapshot.forEach(
@@ -188,7 +197,7 @@ async function loadDonations(year) {
                     donationDoc.data();
 
 
-                donations.push({
+                allDonations.push({
 
                     id:
                         donationDoc.id,
@@ -203,155 +212,16 @@ async function loadDonations(year) {
 
         // Newest first
 
-        donations.sort(
-            (a, b) => {
-
-                return (
-                    getDateValue(b.date) -
-                    getDateValue(a.date)
-                );
-
-            }
+        allDonations.sort(
+            (a, b) =>
+                getDateValue(b.date) -
+                getDateValue(a.date)
         );
 
 
-        donations.forEach(
-            (donation) => {
+        updateSummary();
 
-                const amount =
-                    Number(
-                        donation.amount
-                    ) || 0;
-
-
-                total += amount;
-
-
-                const row =
-                    document.createElement(
-                        "tr"
-                    );
-
-
-                const status =
-                    donation.status ||
-                    "pending";
-
-
-                let actionHTML;
-
-
-                if (
-                    status ===
-                    "pending"
-                ) {
-
-                    actionHTML = `
-
-                        <button
-                            class="btn-primary verify-donation-btn"
-                            data-id="${donation.id}">
-
-                            Verify & Publish
-
-                        </button>
-
-                    `;
-
-                } else {
-
-                    actionHTML = `
-
-                        <span class="published-label">
-                            Published
-                        </span>
-
-                    `;
-
-                }
-
-
-                row.innerHTML = `
-
-                    <td>
-                        ${formatDate(
-                            donation.date
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            donation.donorName || "-"
-                        )}
-                    </td>
-
-                    <td>
-                        ${formatCurrency(
-                            amount
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            donation.paymentMethod || "-"
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            donation.festivalYear || "-"
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            status
-                        )}
-                    </td>
-
-                    <td>
-                        ${actionHTML}
-                    </td>
-
-                `;
-
-
-                donationTableBody.appendChild(
-                    row
-                );
-
-            }
-        );
-
-
-        totalDonations.textContent =
-            formatCurrency(total);
-
-
-        // =========================================
-        // VERIFY BUTTONS
-        // =========================================
-
-        document
-            .querySelectorAll(
-                ".verify-donation-btn"
-            )
-            .forEach(
-                (button) => {
-
-                    button.addEventListener(
-                        "click",
-                        () => {
-
-                            verifyDonation(
-                                button.dataset.id
-                            );
-
-                        }
-                    );
-
-                }
-            );
+        renderDonations();
 
 
     } catch (error) {
@@ -369,28 +239,366 @@ async function loadDonations(year) {
                 </td>
             </tr>
         `;
-
     }
+}
+
+
+// =================================
+// SUMMARY
+// =================================
+
+function updateSummary() {
+
+    let confirmedAmount = 0;
+
+    let pendingAmount = 0;
+
+
+    allDonations.forEach(
+        (donation) => {
+
+            const amount =
+                Number(
+                    donation.amount || 0
+                );
+
+
+            if (
+                donation.status ===
+                "confirmed"
+            ) {
+
+                confirmedAmount +=
+                    amount;
+            }
+
+
+            if (
+                donation.status ===
+                "pending"
+            ) {
+
+                pendingAmount +=
+                    amount;
+            }
+
+        }
+    );
+
+
+    confirmedTotal.textContent =
+        formatCurrency(
+            confirmedAmount
+        );
+
+
+    pendingTotal.textContent =
+        formatCurrency(
+            pendingAmount
+        );
+
+
+    // Official donation total
+    // contains confirmed donations only
+
+    totalDonations.textContent =
+        formatCurrency(
+            confirmedAmount
+        );
+}
+
+
+// =================================
+// RENDER DONATIONS
+// =================================
+
+function renderDonations() {
+
+    const filter =
+        statusFilter.value;
+
+
+    let donations =
+        allDonations;
+
+
+    if (filter !== "all") {
+
+        donations =
+            allDonations.filter(
+                donation =>
+                    donation.status ===
+                    filter
+            );
+    }
+
+
+    if (donations.length === 0) {
+
+        donationTableBody.innerHTML = `
+            <tr>
+                <td colspan="7">
+                    No donations found.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    donationTableBody.innerHTML =
+        donations.map(
+            (donation) => {
+
+                const status =
+                    donation.status ||
+                    "pending";
+
+
+                let actionHTML = "";
+
+
+                // -----------------------------
+                // PENDING
+                // -----------------------------
+
+                if (
+                    status ===
+                    "pending"
+                ) {
+
+                    actionHTML = `
+
+                        <button
+                            type="button"
+                            class="verify-btn"
+                            data-id="${donation.id}">
+                            ✅ Verify & Publish
+                        </button>
+
+                        <button
+                            type="button"
+                            class="reject-btn"
+                            data-id="${donation.id}">
+                            ❌ Reject
+                        </button>
+
+                    `;
+
+                }
+
+
+                // -----------------------------
+                // CONFIRMED
+                // -----------------------------
+
+                else if (
+                    status ===
+                    "confirmed"
+                ) {
+
+                    actionHTML = `
+
+                        <button
+                            type="button"
+                            class="edit-btn"
+                            data-id="${donation.id}">
+                            ✏️ Edit
+                        </button>
+
+                        <span class="published-status">
+                            Published
+                        </span>
+
+                    `;
+
+                }
+
+
+                // -----------------------------
+                // REJECTED
+                // -----------------------------
+
+                else if (
+                    status ===
+                    "rejected"
+                ) {
+
+                    actionHTML = `
+
+                        <button
+                            type="button"
+                            class="edit-btn"
+                            data-id="${donation.id}">
+                            ✏️ Edit
+                        </button>
+
+                        <span class="rejected-status">
+                            Rejected
+                        </span>
+
+                    `;
+
+                }
+
+
+                return `
+
+                    <tr>
+
+                        <td>
+                            ${formatDate(
+                                donation.date
+                            )}
+                        </td>
+
+
+                        <td>
+                            ${escapeHTML(
+                                donation.donorName ||
+                                "Anonymous"
+                            )}
+                        </td>
+
+
+                        <td>
+                            ${formatCurrency(
+                                Number(
+                                    donation.amount ||
+                                    0
+                                )
+                            )}
+                        </td>
+
+
+                        <td>
+                            ${escapeHTML(
+                                donation.paymentMethod ||
+                                "-"
+                            )}
+                        </td>
+
+
+                        <td>
+                            ${escapeHTML(
+                                donation.festivalYear ||
+                                "-"
+                            )}
+                        </td>
+
+
+                        <td>
+
+                            <span
+                                class="status ${status}">
+                                ${status}
+                            </span>
+
+                        </td>
+
+
+                        <td>
+                            ${actionHTML}
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+        ).join("");
+
+
+    // =================================
+    // VERIFY BUTTONS
+    // =================================
+
+    document
+        .querySelectorAll(".verify-btn")
+        .forEach(
+            (button) => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        verifyDonation(
+                            button.dataset.id
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    // =================================
+    // REJECT BUTTONS
+    // =================================
+
+    document
+        .querySelectorAll(".reject-btn")
+        .forEach(
+            (button) => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        rejectDonation(
+                            button.dataset.id
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    // =================================
+    // EDIT BUTTONS
+    // =================================
+
+    document
+        .querySelectorAll(".edit-btn")
+        .forEach(
+            (button) => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        startEditDonation(
+                            button.dataset.id
+                        );
+
+                    }
+                );
+
+            }
+        );
 
 }
 
 
-// =========================================
-// VERIFY + PUBLISH DONATION
-// =========================================
+// =================================
+// VERIFY DONATION
+// =================================
 
 async function verifyDonation(
     donationId
 ) {
 
-    const confirmed =
+    const confirmVerification =
         confirm(
-            "Verify this donation and publish it to Transparency?"
+            "Are you sure you want to verify and publish this donation?"
         );
 
 
-    if (!confirmed) {
-
+    if (!confirmVerification) {
         return;
     }
 
@@ -405,36 +613,29 @@ async function verifyDonation(
             );
 
 
-        // =========================================
-        // FIRESTORE TRANSACTION
-        // =========================================
-
         await runTransaction(
             db,
             async (transaction) => {
 
-                const donationSnap =
+                const donationSnapshot =
                     await transaction.get(
                         donationRef
                     );
 
 
                 if (
-                    !donationSnap.exists()
+                    !donationSnapshot.exists()
                 ) {
 
                     throw new Error(
                         "Donation no longer exists."
                     );
-
                 }
 
 
                 const donation =
-                    donationSnap.data();
+                    donationSnapshot.data();
 
-
-                // Already verified
 
                 if (
                     donation.status ===
@@ -444,13 +645,19 @@ async function verifyDonation(
                     throw new Error(
                         "This donation is already verified."
                     );
-
                 }
 
 
-                // =========================================
-                // CREATE PUBLIC DONATION
-                // =========================================
+                if (
+                    donation.status ===
+                    "rejected"
+                ) {
+
+                    throw new Error(
+                        "Rejected donations cannot be verified."
+                    );
+                }
+
 
                 const publicDonationRef =
                     doc(
@@ -463,13 +670,17 @@ async function verifyDonation(
 
                 const publicDonation = {
 
+                    privateDonationId:
+                        donationId,
+
                     donorName:
                         donation.donorName ||
                         "Anonymous",
 
                     amount:
                         Number(
-                            donation.amount || 0
+                            donation.amount ||
+                            0
                         ),
 
                     paymentMethod:
@@ -495,10 +706,6 @@ async function verifyDonation(
                 );
 
 
-                // =========================================
-                // UPDATE PRIVATE DONATION
-                // =========================================
-
                 transaction.update(
                     donationRef,
                     {
@@ -516,15 +723,13 @@ async function verifyDonation(
         );
 
 
-        loadDonations(
-            festivalYear.value
-        );
+        await loadDonations();
 
 
     } catch (error) {
 
         console.error(
-            "Verification error:",
+            "Error verifying donation:",
             error
         );
 
@@ -533,62 +738,488 @@ async function verifyDonation(
             "Unable to verify donation.\n\n" +
             error.message
         );
-
     }
-
 }
 
 
-// =========================================
-// FESTIVAL YEAR CHANGE
-// =========================================
+// =================================
+// REJECT DONATION
+// =================================
 
-festivalYear.addEventListener(
-    "change",
-    () => {
+async function rejectDonation(
+    donationId
+) {
 
-        loadDonations(
-            festivalYear.value
+    const donation =
+        allDonations.find(
+            item =>
+                item.id ===
+                donationId
         );
 
+
+    if (!donation) {
+
+        alert(
+            "Donation not found."
+        );
+
+        return;
     }
-);
 
 
-// =========================================
-// LOGOUT
-// =========================================
+    if (
+        donation.status !==
+        "pending"
+    ) {
 
-logoutBtn.addEventListener(
-    "click",
+        alert(
+            "Only pending donations can be rejected."
+        );
+
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            `Reject donation from "${donation.donorName || "Anonymous"}" for ${formatCurrency(
+                Number(
+                    donation.amount ||
+                    0
+                )
+            )}?\n\nThis donation will NOT appear on the Transparency page.`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const donationRef =
+            doc(
+                db,
+                "donations",
+                donationId
+            );
+
+
+        await runTransaction(
+            db,
+            async (transaction) => {
+
+                const donationSnapshot =
+                    await transaction.get(
+                        donationRef
+                    );
+
+
+                if (
+                    !donationSnapshot.exists()
+                ) {
+
+                    throw new Error(
+                        "Donation no longer exists."
+                    );
+                }
+
+
+                const currentDonation =
+                    donationSnapshot.data();
+
+
+                if (
+                    currentDonation.status !==
+                    "pending"
+                ) {
+
+                    throw new Error(
+                        "This donation is no longer pending."
+                    );
+                }
+
+
+                transaction.update(
+                    donationRef,
+                    {
+                        status:
+                            "rejected"
+                    }
+                );
+
+            }
+        );
+
+
+        alert(
+            "Donation rejected successfully."
+        );
+
+
+        await loadDonations();
+
+
+    } catch (error) {
+
+        console.error(
+            "Error rejecting donation:",
+            error
+        );
+
+
+        alert(
+            "Unable to reject donation.\n\n" +
+            error.message
+        );
+    }
+}
+
+
+// =================================
+// START EDIT
+// =================================
+
+function startEditDonation(
+    donationId
+) {
+
+    const donation =
+        allDonations.find(
+            item =>
+                item.id ===
+                donationId
+        );
+
+
+    if (!donation) {
+
+        alert(
+            "Donation not found."
+        );
+
+        return;
+    }
+
+
+    editingDonationId =
+        donationId;
+
+
+    editDonorName.value =
+        donation.donorName ||
+        "";
+
+
+    editDonationAmount.value =
+        donation.amount ||
+        "";
+
+
+    editPaymentMethod.value =
+        donation.paymentMethod ||
+        "";
+
+
+    editFestivalYear.value =
+        donation.festivalYear ||
+        festivalYear.value;
+
+
+    editDonationDate.value =
+        getInputDate(
+            donation.date
+        );
+
+
+    editDonationSection.style.display =
+        "block";
+
+
+    editDonationSection.scrollIntoView({
+        behavior: "smooth"
+    });
+}
+
+
+// =================================
+// UPDATE DONATION
+// =================================
+
+editDonationForm.addEventListener(
+    "submit",
     async (event) => {
 
         event.preventDefault();
 
 
+        if (!editingDonationId) {
+            return;
+        }
+
+
+        const donorName =
+            editDonorName.value.trim();
+
+
+        const amount =
+            Number(
+                editDonationAmount.value
+            );
+
+
+        const paymentMethod =
+            editPaymentMethod.value.trim();
+
+
+        const year =
+            editFestivalYear.value;
+
+
+        const selectedDate =
+            editDonationDate.value;
+
+
+        if (!donorName) {
+
+            alert(
+                "Enter donor name."
+            );
+
+            return;
+        }
+
+
+        if (!amount || amount <= 0) {
+
+            alert(
+                "Enter a valid donation amount."
+            );
+
+            return;
+        }
+
+
+        if (!paymentMethod) {
+
+            alert(
+                "Select payment method."
+            );
+
+            return;
+        }
+
+
+        if (!selectedDate) {
+
+            alert(
+                "Select donation date."
+            );
+
+            return;
+        }
+
+
         try {
 
-            await signOut(auth);
+            const donationRef =
+                doc(
+                    db,
+                    "donations",
+                    editingDonationId
+                );
 
-            window.location.href =
-                "../login.html";
+
+            const donationSnapshot =
+                await getDoc(
+                    donationRef
+                );
+
+
+            if (
+                !donationSnapshot.exists()
+            ) {
+
+                throw new Error(
+                    "Donation no longer exists."
+                );
+            }
+
+
+            const oldDonation =
+                donationSnapshot.data();
+
+
+            // =================================
+            // UPDATE PRIVATE DONATION
+            // =================================
+
+            await updateDoc(
+                donationRef,
+                {
+                    donorName,
+                    amount,
+                    paymentMethod,
+                    festivalYear:
+                        year,
+                    date:
+                        new Date(
+                            selectedDate
+                        )
+                }
+            );
+
+
+            // =================================
+            // IF CONFIRMED, UPDATE PUBLIC
+            // =================================
+
+            if (
+                oldDonation.status ===
+                "confirmed"
+            ) {
+
+                const publicQuery =
+                    query(
+                        collection(
+                            db,
+                            "publicDonations"
+                        ),
+                        where(
+                            "privateDonationId",
+                            "==",
+                            editingDonationId
+                        )
+                    );
+
+
+                const publicSnapshot =
+                    await getDocs(
+                        publicQuery
+                    );
+
+
+                if (
+                    !publicSnapshot.empty
+                ) {
+
+                    for (
+                        const publicDoc
+                        of publicSnapshot.docs
+                    ) {
+
+                        await updateDoc(
+                            publicDoc.ref,
+                            {
+                                donorName,
+                                amount,
+                                paymentMethod,
+                                festivalYear:
+                                    year,
+                                date:
+                                    new Date(
+                                        selectedDate
+                                    )
+                            }
+                        );
+
+                    }
+
+                }
+
+            }
+
+
+            alert(
+                "Donation updated successfully! ✅"
+            );
+
+
+            editingDonationId =
+                null;
+
+
+            editDonationSection.style.display =
+                "none";
+
+
+            editDonationForm.reset();
+
+
+            await loadDonations();
+
 
         } catch (error) {
 
             console.error(
-                "Logout error:",
+                "Error updating donation:",
                 error
             );
 
+
+            alert(
+                "Unable to update donation.\n\n" +
+                error.message
+            );
         }
 
     }
 );
 
 
-// =========================================
+// =================================
+// CANCEL EDIT
+// =================================
+
+cancelEditBtn.addEventListener(
+    "click",
+    () => {
+
+        editingDonationId =
+            null;
+
+
+        editDonationSection.style.display =
+            "none";
+
+
+        editDonationForm.reset();
+
+    }
+);
+
+
+// =================================
+// EVENTS
+// =================================
+
+festivalYear.addEventListener(
+    "change",
+    () => {
+
+        editDonationSection.style.display =
+            "none";
+
+        editingDonationId =
+            null;
+
+        loadDonations();
+
+    }
+);
+
+
+statusFilter.addEventListener(
+    "change",
+    renderDonations
+);
+
+
+// =================================
 // HELPERS
-// =========================================
+// =================================
 
 function formatCurrency(amount) {
 
@@ -596,116 +1227,178 @@ function formatCurrency(amount) {
         "en-IN",
         {
             style: "currency",
-            currency: "INR",
-            maximumFractionDigits: 2
+            currency: "INR"
         }
     ).format(amount);
 
 }
 
 
-function formatDate(value) {
-
-    const date =
-        convertToDate(value);
-
+function formatDate(date) {
 
     if (!date) {
-
         return "-";
-
     }
 
 
-    return date.toLocaleDateString(
-        "en-IN"
-    );
-
-}
+    let value;
 
 
-function getDateValue(value) {
+    if (date.toDate) {
 
-    const date =
-        convertToDate(value);
+        value =
+            date.toDate();
 
+    } else if (date.seconds) {
 
-    return date
-        ? date.getTime()
-        : 0;
+        value =
+            new Date(
+                date.seconds * 1000
+            );
 
-}
+    } else {
 
-
-function convertToDate(value) {
-
-    if (!value) {
-
-        return null;
+        value =
+            new Date(date);
 
     }
 
 
     if (
-        typeof value.toDate ===
-        "function"
+        isNaN(
+            value.getTime()
+        )
     ) {
 
-        return value.toDate();
-
+        return "-";
     }
 
 
-    if (value instanceof Date) {
-
-        return value;
-
-    }
-
-
-    const date =
-        new Date(value);
-
-
-    return isNaN(
-        date.getTime()
-    )
-        ? null
-        : date;
-
+    return value.toLocaleDateString(
+        "en-IN"
+    );
 }
 
 
-// =========================================
-// HTML SECURITY
-// =========================================
+function getInputDate(date) {
 
-function escapeHtml(value) {
+    if (!date) {
+        return "";
+    }
+
+
+    let value;
+
+
+    if (date.toDate) {
+
+        value =
+            date.toDate();
+
+    } else if (date.seconds) {
+
+        value =
+            new Date(
+                date.seconds * 1000
+            );
+
+    } else {
+
+        value =
+            new Date(date);
+
+    }
+
+
+    if (
+        isNaN(
+            value.getTime()
+        )
+    ) {
+
+        return "";
+    }
+
+
+    const year =
+        value.getFullYear();
+
+
+    const month =
+        String(
+            value.getMonth() + 1
+        ).padStart(2, "0");
+
+
+    const day =
+        String(
+            value.getDate()
+        ).padStart(2, "0");
+
+
+    return `${year}-${month}-${day}`;
+}
+
+
+function getDateValue(date) {
+
+    if (!date) {
+        return 0;
+    }
+
+
+    if (date.toDate) {
+
+        return date
+            .toDate()
+            .getTime();
+
+    }
+
+
+    if (date.seconds) {
+
+        return (
+            date.seconds *
+            1000
+        );
+
+    }
+
+
+    const value =
+        new Date(date);
+
+
+    return isNaN(
+        value.getTime()
+    )
+        ? 0
+        : value.getTime();
+}
+
+
+function escapeHTML(value) {
 
     return String(value)
-
-        .replaceAll(
-            "&",
+        .replace(
+            /&/g,
             "&amp;"
         )
-
-        .replaceAll(
-            "<",
+        .replace(
+            /</g,
             "&lt;"
         )
-
-        .replaceAll(
-            ">",
+        .replace(
+            />/g,
             "&gt;"
         )
-
-        .replaceAll(
-            '"',
+        .replace(
+            /"/g,
             "&quot;"
         )
-
-        .replaceAll(
-            "'",
+        .replace(
+            /'/g,
             "&#039;"
         );
 

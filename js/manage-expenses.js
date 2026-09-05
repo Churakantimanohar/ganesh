@@ -1,80 +1,80 @@
-
 import { auth, db } from "./firebase-config.js";
 
 import {
-    onAuthStateChanged,
-    signOut
+    onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 import {
-    doc,
-    getDoc,
     collection,
-    getDocs,
     query,
     where,
+    getDocs,
+    doc,
+    getDoc,
     updateDoc,
-    deleteDoc
+    deleteDoc,
+    setDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
+const festivalYear = document.getElementById("festivalYear");
+const expenseTableBody = document.getElementById("expenseTableBody");
 
-// =========================================
-// Elements
-// =========================================
-
-const festivalYear =
-    document.getElementById("festivalYear");
-
-const expenseTableBody =
-    document.getElementById("expenseTableBody");
-
-const totalExpenses =
-    document.getElementById("totalExpenses");
-
-const logoutBtn =
-    document.getElementById("logoutBtn");
-
-const editModal =
-    document.getElementById("editModal");
-
-const closeModal =
-    document.getElementById("closeModal");
+const editExpenseSection =
+    document.getElementById("editExpenseSection");
 
 const editExpenseForm =
     document.getElementById("editExpenseForm");
 
-const editMessage =
-    document.getElementById("editMessage");
+const editExpenseName =
+    document.getElementById("editExpenseName");
+
+const editCategory =
+    document.getElementById("editCategory");
+
+const editAmount =
+    document.getElementById("editAmount");
+
+const editDescription =
+    document.getElementById("editDescription");
+
+const editFestivalYear =
+    document.getElementById("editFestivalYear");
+
+const editExpenseDate =
+    document.getElementById("editExpenseDate");
+
+const cancelEditBtn =
+    document.getElementById("cancelEditBtn");
+
+let allExpenses = [];
+let editingExpenseId = null;
 
 
-// =========================================
-// Admin Authentication
-// =========================================
+// =================================
+// ADMIN CHECK
+// =================================
 
 onAuthStateChanged(auth, async (user) => {
 
     if (!user) {
-
         window.location.href = "../login.html";
-
         return;
     }
 
-
     try {
 
-        const userRef =
-            doc(db, "users", user.uid);
+        const userRef = doc(
+            db,
+            "users",
+            user.uid
+        );
 
-        const userSnap =
+        const userSnapshot =
             await getDoc(userRef);
 
+        if (!userSnapshot.exists()) {
 
-        if (!userSnap.exists()) {
-
-            alert("User profile not found.");
-
-            await signOut(auth);
+            await auth.signOut();
 
             window.location.href =
                 "../login.html";
@@ -82,10 +82,8 @@ onAuthStateChanged(auth, async (user) => {
             return;
         }
 
-
         const userData =
-            userSnap.data();
-
+            userSnapshot.data();
 
         if (userData.role !== "admin") {
 
@@ -99,21 +97,17 @@ onAuthStateChanged(auth, async (user) => {
             return;
         }
 
-
-        console.log(
-            "Admin access granted."
-        );
-
-
-        loadExpenses(
-            festivalYear.value
-        );
+        loadExpenses();
 
     } catch (error) {
 
         console.error(
             "Admin verification error:",
             error
+        );
+
+        alert(
+            "Unable to verify admin access."
         );
 
         window.location.href =
@@ -123,207 +117,42 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 
-// =========================================
-// Load Expenses
-// =========================================
+// =================================
+// LOAD EXPENSES
+// =================================
 
-async function loadExpenses(year) {
-
-    expenseTableBody.innerHTML = `
-        <tr>
-            <td colspan="6">
-                Loading expenses...
-            </td>
-        </tr>
-    `;
-
+async function loadExpenses() {
 
     try {
 
-        const expenseQuery = query(
+        const year = festivalYear.value;
+
+        const expensesQuery = query(
             collection(db, "expenses"),
-            where(
-                "festivalYear",
-                "==",
-                year
-            )
+            where("festivalYear", "==", year)
         );
 
-
         const snapshot =
-            await getDocs(expenseQuery);
+            await getDocs(expensesQuery);
 
-
-        expenseTableBody.innerHTML = "";
-
-
-        let total = 0;
-
-
-        if (snapshot.empty) {
-
-            expenseTableBody.innerHTML = `
-                <tr>
-                    <td colspan="6">
-                        No expenses found.
-                    </td>
-                </tr>
-            `;
-
-            totalExpenses.textContent = "₹0";
-
-            return;
-        }
-
-
-        const expenses = [];
-
+        allExpenses = [];
 
         snapshot.forEach((expenseDoc) => {
 
-            const data =
-                expenseDoc.data();
-
-
-            expenses.push({
+            allExpenses.push({
                 id: expenseDoc.id,
-                ...data
+                ...expenseDoc.data()
             });
 
         });
 
+        allExpenses.sort(
+            (a, b) =>
+                getDateValue(b.date) -
+                getDateValue(a.date)
+        );
 
-        // Sort newest first
-        expenses.sort((a, b) => {
-
-            const dateA =
-                getDateValue(a.date);
-
-            const dateB =
-                getDateValue(b.date);
-
-            return dateB - dateA;
-
-        });
-
-
-        expenses.forEach((expense) => {
-
-            const amount =
-                Number(expense.amount) || 0;
-
-
-            total += amount;
-
-
-            const row =
-                document.createElement("tr");
-
-
-            row.innerHTML = `
-
-                <td>
-                    ${formatDate(expense.date)}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        expense.title || "-"
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        expense.category || "-"
-                    )}
-                </td>
-
-                <td>
-                    ${formatCurrency(amount)}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        expense.description || "-"
-                    )}
-                </td>
-
-                <td>
-
-                    <button
-                        class="edit-btn"
-                        data-id="${expense.id}"
-                    >
-                        Edit
-                    </button>
-
-                    <button
-                        class="delete-btn"
-                        data-id="${expense.id}"
-                    >
-                        Delete
-                    </button>
-
-                </td>
-            `;
-
-
-            expenseTableBody.appendChild(row);
-
-        });
-
-
-        totalExpenses.textContent =
-            formatCurrency(total);
-
-
-        // Add button events
-        document
-            .querySelectorAll(".edit-btn")
-            .forEach((button) => {
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        const expense =
-                            expenses.find(
-                                item =>
-                                    item.id ===
-                                    button.dataset.id
-                            );
-
-                        if (expense) {
-
-                            openEditModal(
-                                expense
-                            );
-
-                        }
-
-                    }
-                );
-
-            });
-
-
-        document
-            .querySelectorAll(".delete-btn")
-            .forEach((button) => {
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        deleteExpense(
-                            button.dataset.id
-                        );
-
-                    }
-                );
-
-            });
-
+        renderExpenses();
 
     } catch (error) {
 
@@ -332,100 +161,184 @@ async function loadExpenses(year) {
             error
         );
 
-
         expenseTableBody.innerHTML = `
             <tr>
-                <td colspan="6">
+                <td colspan="7">
                     Unable to load expenses.
                 </td>
             </tr>
         `;
     }
+}
+
+
+// =================================
+// RENDER EXPENSES
+// =================================
+
+function renderExpenses() {
+
+    if (allExpenses.length === 0) {
+
+        expenseTableBody.innerHTML = `
+            <tr>
+                <td colspan="7">
+                    No expenses found.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    expenseTableBody.innerHTML =
+        allExpenses.map((expense) => {
+
+            return `
+                <tr>
+
+                    <td>
+                        ${formatDate(expense.date)}
+                    </td>
+
+                    <td>
+                        ${escapeHTML(
+                            expense.title || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHTML(
+                            expense.category || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${formatCurrency(
+                            Number(expense.amount || 0)
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHTML(
+                            expense.description || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHTML(
+                            expense.festivalYear || "-"
+                        )}
+                    </td>
+
+                    <td>
+
+                        <button
+                            type="button"
+                            class="edit-btn"
+                            data-id="${expense.id}">
+                            ✏️ Edit
+                        </button>
+
+                        <button
+                            type="button"
+                            class="delete-btn"
+                            data-id="${expense.id}">
+                            🗑️ Delete
+                        </button>
+
+                    </td>
+
+                </tr>
+            `;
+
+        }).join("");
+
+
+    document
+        .querySelectorAll(".edit-btn")
+        .forEach((button) => {
+
+            button.addEventListener(
+                "click",
+                () => {
+                    startEdit(
+                        button.dataset.id
+                    );
+                }
+            );
+
+        });
+
+
+    document
+        .querySelectorAll(".delete-btn")
+        .forEach((button) => {
+
+            button.addEventListener(
+                "click",
+                () => {
+                    deleteExpense(
+                        button.dataset.id
+                    );
+                }
+            );
+
+        });
 
 }
 
 
-// =========================================
-// Open Edit Modal
-// =========================================
+// =================================
+// START EDIT
+// =================================
 
-function openEditModal(expense) {
+function startEdit(expenseId) {
 
-    document.getElementById(
-        "editExpenseId"
-    ).value = expense.id;
+    const expense =
+        allExpenses.find(
+            item => item.id === expenseId
+        );
 
+    if (!expense) {
 
-    document.getElementById(
-        "editExpenseName"
-    ).value =
+        alert("Expense not found.");
+
+        return;
+    }
+
+    editingExpenseId = expenseId;
+
+    editExpenseName.value =
         expense.title || "";
 
+    editCategory.value =
+        expense.category || "";
 
-    document.getElementById(
-        "editCategory"
-    ).value =
-        expense.category || "Other";
-
-
-    document.getElementById(
-        "editAmount"
-    ).value =
+    editAmount.value =
         expense.amount || "";
 
-
-    document.getElementById(
-        "editDescription"
-    ).value =
+    editDescription.value =
         expense.description || "";
 
+    editFestivalYear.value =
+        expense.festivalYear || festivalYear.value;
 
-    document.getElementById(
-        "editDate"
-    ).value =
-        getDateForInput(expense.date);
+    editExpenseDate.value =
+        getInputDate(expense.date);
 
+    editExpenseSection.style.display =
+        "block";
 
-    editMessage.textContent = "";
-
-
-    editModal.style.display = "flex";
+    editExpenseSection.scrollIntoView({
+        behavior: "smooth"
+    });
 }
 
 
-// =========================================
-// Close Modal
-// =========================================
-
-closeModal.addEventListener(
-    "click",
-    () => {
-
-        editModal.style.display = "none";
-
-    }
-);
-
-
-// Close when clicking outside
-editModal.addEventListener(
-    "click",
-    (event) => {
-
-        if (event.target === editModal) {
-
-            editModal.style.display =
-                "none";
-
-        }
-
-    }
-);
-
-
-// =========================================
-// Save Edited Expense
-// =========================================
+// =================================
+// UPDATE EXPENSE
+// =================================
 
 editExpenseForm.addEventListener(
     "submit",
@@ -433,54 +346,61 @@ editExpenseForm.addEventListener(
 
         event.preventDefault();
 
-
-        const expenseId =
-            document.getElementById(
-                "editExpenseId"
-            ).value;
-
+        if (!editingExpenseId) {
+            return;
+        }
 
         const title =
-            document.getElementById(
-                "editExpenseName"
-            ).value.trim();
-
+            editExpenseName.value.trim();
 
         const category =
-            document.getElementById(
-                "editCategory"
-            ).value;
-
+            editCategory.value.trim();
 
         const amount =
-            Number(
-                document.getElementById(
-                    "editAmount"
-                ).value
-            );
-
+            Number(editAmount.value);
 
         const description =
-            document.getElementById(
-                "editDescription"
-            ).value.trim();
+            editDescription.value.trim();
+
+        const year =
+            editFestivalYear.value;
+
+        const selectedDate =
+            editExpenseDate.value;
 
 
-        const date =
-            document.getElementById(
-                "editDate"
-            ).value;
+        if (!title) {
 
+            alert(
+                "Enter expense name."
+            );
 
-        if (
-            !title ||
-            !category ||
-            amount <= 0 ||
-            !date
-        ) {
+            return;
+        }
 
-            editMessage.textContent =
-                "Please fill all required fields.";
+        if (!category) {
+
+            alert(
+                "Enter category."
+            );
+
+            return;
+        }
+
+        if (!amount || amount <= 0) {
+
+            alert(
+                "Enter a valid amount."
+            );
+
+            return;
+        }
+
+        if (!selectedDate) {
+
+            alert(
+                "Select expense date."
+            );
 
             return;
         }
@@ -488,37 +408,121 @@ editExpenseForm.addEventListener(
 
         try {
 
-            await updateDoc(
+            // Find the original expense
+            const originalExpense =
+                allExpenses.find(
+                    expense =>
+                        expense.id ===
+                        editingExpenseId
+                );
+
+            if (!originalExpense) {
+
+                alert(
+                    "Original expense not found."
+                );
+
+                return;
+            }
+
+
+            // -----------------------------
+            // UPDATE PRIVATE EXPENSE
+            // -----------------------------
+
+            const expenseRef =
                 doc(
                     db,
                     "expenses",
-                    expenseId
-                ),
+                    editingExpenseId
+                );
+
+            await updateDoc(
+                expenseRef,
                 {
-                    title: title,
-                    category: category,
-                    amount: amount,
-                    description: description,
-                    date: new Date(date)
+                    title,
+                    category,
+                    amount,
+                    description,
+                    festivalYear: year,
+                    date: new Date(selectedDate)
                 }
             );
 
 
-            editMessage.textContent =
-                "Expense updated successfully!";
+            // -----------------------------
+            // FIND PUBLIC EXPENSE BY ID
+            // -----------------------------
+
+            const publicQuery = query(
+                collection(db, "publicExpenses"),
+                where(
+                    "privateExpenseId",
+                    "==",
+                    editingExpenseId
+                )
+            );
+
+            const publicSnapshot =
+                await getDocs(publicQuery);
 
 
-            setTimeout(() => {
+            // -----------------------------
+            // UPDATE PUBLIC EXPENSE
+            // -----------------------------
 
-                editModal.style.display =
-                    "none";
+            if (!publicSnapshot.empty) {
 
-                loadExpenses(
-                    festivalYear.value
+                for (
+                    const publicDoc
+                    of publicSnapshot.docs
+                ) {
+
+                    await updateDoc(
+                        publicDoc.ref,
+                        {
+                            title,
+                            category,
+                            amount,
+                            description,
+                            festivalYear: year,
+                            date: new Date(selectedDate)
+                        }
+                    );
+
+                }
+
+            } else {
+
+                /*
+                 * If the public record does not exist,
+                 * create it.
+                 */
+
+                await addPublicExpense(
+                    editingExpenseId,
+                    title,
+                    category,
+                    amount,
+                    description,
+                    year,
+                    selectedDate
                 );
+            }
 
-            }, 700);
 
+            alert(
+                "Expense updated successfully! ✅"
+            );
+
+            editingExpenseId = null;
+
+            editExpenseSection.style.display =
+                "none";
+
+            editExpenseForm.reset();
+
+            await loadExpenses();
 
         } catch (error) {
 
@@ -527,53 +531,140 @@ editExpenseForm.addEventListener(
                 error
             );
 
-
-            editMessage.textContent =
-                "Failed to update expense.";
+            alert(
+                "Unable to update expense.\n\n" +
+                error.message
+            );
         }
 
     }
 );
 
 
-// =========================================
-// Delete Expense
-// =========================================
+// =================================
+// ADD PUBLIC EXPENSE
+// =================================
+
+async function addPublicExpense(
+    privateExpenseId,
+    title,
+    category,
+    amount,
+    description,
+    year,
+    selectedDate
+) {
+
+    const publicExpenseRef =
+        doc(
+            collection(db, "publicExpenses")
+        );
+
+    await setDoc(
+        publicExpenseRef,
+        {
+            privateExpenseId,
+            title,
+            category,
+            amount,
+            description,
+            festivalYear: year,
+            date: new Date(selectedDate)
+        }
+    );
+}
+
+
+// =================================
+// DELETE EXPENSE
+// =================================
 
 async function deleteExpense(expenseId) {
 
-    const confirmDelete =
-        confirm(
-            "Are you sure you want to delete this expense?"
+    const expense =
+        allExpenses.find(
+            item => item.id === expenseId
         );
 
+    if (!expense) {
 
-    if (!confirmDelete) {
+        alert(
+            "Expense not found."
+        );
 
+        return;
+    }
+
+
+    const confirmed = confirm(
+        `Delete "${expense.title}" for ${formatCurrency(
+            Number(expense.amount || 0)
+        )}?
+
+This will remove the expense from the transparency page as well.`
+    );
+
+    if (!confirmed) {
         return;
     }
 
 
     try {
 
-        await deleteDoc(
+        // -----------------------------
+        // DELETE PRIVATE EXPENSE
+        // -----------------------------
+
+        const expenseRef =
             doc(
                 db,
                 "expenses",
                 expenseId
+            );
+
+        await deleteDoc(
+            expenseRef
+        );
+
+
+        // -----------------------------
+        // FIND PUBLIC EXPENSE BY ID
+        // -----------------------------
+
+        const publicQuery = query(
+            collection(db, "publicExpenses"),
+            where(
+                "privateExpenseId",
+                "==",
+                expenseId
             )
         );
 
+        const publicSnapshot =
+            await getDocs(publicQuery);
+
+
+        // -----------------------------
+        // DELETE PUBLIC EXPENSE
+        // -----------------------------
+
+        for (
+            const publicDoc
+            of publicSnapshot.docs
+        ) {
+
+            await deleteDoc(
+                publicDoc.ref
+            );
+
+        }
+
 
         alert(
-            "Expense deleted successfully."
+            "Expense deleted successfully! 🗑️"
         );
 
-
-        loadExpenses(
-            festivalYear.value
-        );
-
+        await loadExpenses();
 
     } catch (error) {
 
@@ -582,53 +673,55 @@ async function deleteExpense(expenseId) {
             error
         );
 
-
         alert(
-            "Failed to delete expense."
+            "Unable to delete expense.\n\n" +
+            error.message
         );
     }
-
 }
 
 
-// =========================================
-// Festival Year Change
-// =========================================
+// =================================
+// CANCEL EDIT
+// =================================
+
+cancelEditBtn.addEventListener(
+    "click",
+    () => {
+
+        editingExpenseId = null;
+
+        editExpenseSection.style.display =
+            "none";
+
+        editExpenseForm.reset();
+
+    }
+);
+
+
+// =================================
+// YEAR CHANGE
+// =================================
 
 festivalYear.addEventListener(
     "change",
     () => {
 
-        loadExpenses(
-            festivalYear.value
-        );
+        editExpenseSection.style.display =
+            "none";
+
+        editingExpenseId = null;
+
+        loadExpenses();
 
     }
 );
 
 
-// =========================================
-// Logout
-// =========================================
-
-logoutBtn.addEventListener(
-    "click",
-    async (event) => {
-
-        event.preventDefault();
-
-        await signOut(auth);
-
-        window.location.href =
-            "../login.html";
-
-    }
-);
-
-
-// =========================================
-// Helpers
-// =========================================
+// =================================
+// HELPERS
+// =================================
 
 function formatCurrency(amount) {
 
@@ -636,127 +729,126 @@ function formatCurrency(amount) {
         "en-IN",
         {
             style: "currency",
-            currency: "INR",
-            maximumFractionDigits: 2
+            currency: "INR"
         }
     ).format(amount);
 
 }
 
 
-function formatDate(dateValue) {
-
-    const date =
-        convertToDate(dateValue);
-
+function formatDate(date) {
 
     if (!date) {
-
         return "-";
+    }
+
+    let value;
+
+    if (date.toDate) {
+
+        value = date.toDate();
+
+    } else if (date.seconds) {
+
+        value = new Date(
+            date.seconds * 1000
+        );
+
+    } else {
+
+        value = new Date(date);
 
     }
 
+    if (isNaN(value.getTime())) {
+        return "-";
+    }
 
-    return date.toLocaleDateString(
+    return value.toLocaleDateString(
         "en-IN"
     );
-
 }
 
 
-function getDateValue(dateValue) {
-
-    const date =
-        convertToDate(dateValue);
-
-
-    return date
-        ? date.getTime()
-        : 0;
-
-}
-
-
-function convertToDate(value) {
-
-    if (!value) {
-
-        return null;
-
-    }
-
-
-    if (
-        typeof value.toDate ===
-        "function"
-    ) {
-
-        return value.toDate();
-
-    }
-
-
-    if (value instanceof Date) {
-
-        return value;
-
-    }
-
-
-    const date =
-        new Date(value);
-
-
-    return isNaN(date.getTime())
-        ? null
-        : date;
-
-}
-
-
-function getDateForInput(value) {
-
-    const date =
-        convertToDate(value);
-
+function getInputDate(date) {
 
     if (!date) {
-
         return "";
+    }
+
+    let value;
+
+    if (date.toDate) {
+
+        value = date.toDate();
+
+    } else if (date.seconds) {
+
+        value = new Date(
+            date.seconds * 1000
+        );
+
+    } else {
+
+        value = new Date(date);
 
     }
 
+    if (isNaN(value.getTime())) {
+        return "";
+    }
 
     const year =
-        date.getFullYear();
-
+        value.getFullYear();
 
     const month =
         String(
-            date.getMonth() + 1
+            value.getMonth() + 1
         ).padStart(2, "0");
-
 
     const day =
         String(
-            date.getDate()
+            value.getDate()
         ).padStart(2, "0");
 
-
     return `${year}-${month}-${day}`;
-
 }
 
 
-// Prevent HTML injection
-function escapeHtml(value) {
+function getDateValue(date) {
+
+    if (!date) {
+        return 0;
+    }
+
+    if (date.toDate) {
+
+        return date.toDate().getTime();
+
+    }
+
+    if (date.seconds) {
+
+        return date.seconds * 1000;
+
+    }
+
+    const value =
+        new Date(date);
+
+    return isNaN(value.getTime())
+        ? 0
+        : value.getTime();
+}
+
+
+function escapeHTML(value) {
 
     return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 
 }
-
