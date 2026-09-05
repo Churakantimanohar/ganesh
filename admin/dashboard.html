@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard - Ganapathi Transparency</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+
+            <div class="logo">
+                Ganapathi Transparency
+            </div>
+
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="expenses.html">Add Expense</a>
+                <a href="../expenses.html">View Expenses</a>
+                <a href="#" id="logoutBtn">Logout</a>
+            </div>
+
+        </div>
+    </nav>
+
+
+    <!-- Main Content -->
+    <main class="dashboard-container">
+
+        <!-- Header -->
+        <section class="dashboard-header">
+
+            <h1>Admin Dashboard</h1>
+
+            <p>
+                Manage festival donations, expenses and transparency.
+            </p>
+
+        </section>
+
+
+        <!-- Festival Selection -->
+        <section class="dashboard-section">
+
+            <div class="festival-selector">
+
+                <label for="festivalYear">
+                    Festival Year
+                </label>
+
+                <select id="festivalYear">
+
+                    <option value="2026">
+                        2026
+                    </option>
+
+                    <option value="2027">
+                        2027
+                    </option>
+
+                    <option value="2028">
+                        2028
+                    </option>
+
+                </select>
+
+            </div>
+
+        </section>
+
+
+        <!-- Financial Summary -->
+        <section class="summary-grid">
+
+            <!-- Donations -->
+            <div class="summary-card">
+
+                <h3>Total Donations</h3>
+
+                <p id="totalDonations">
+                    ₹0
+                </p>
+
+            </div>
+
+
+            <!-- Expenses -->
+            <div class="summary-card">
+
+                <h3>Total Expenses</h3>
+
+                <p id="totalExpenses">
+                    ₹0
+                </p>
+
+            </div>
+
+
+            <!-- Balance -->
+            <div class="summary-card">
+
+                <h3>Remaining Balance</h3>
+
+                <p id="remainingBalance">
+                    ₹0
+                </p>
+
+            </div>
+
+        </section>
+
+
+       
+        <!-- Admin Actions -->
+<section class="dashboard-section">
+
+    <h2>Admin Actions</h2>
+
+    <div class="action-grid">
+
+        <!-- Add Expense -->
+        <a href="expenses.html" class="action-card">
+
+            <div class="action-icon">
+                ➕
+            </div>
+
+            <h3>Add Expense</h3>
+
+            <p>
+                Record a new festival expense.
+            </p>
+
+        </a>
+
+
+        <!-- Manage Expenses -->
+        <a href="manage-expenses.html" class="action-card">
+
+            <div class="action-icon">
+                🧾
+            </div>
+
+            <h3>Manage Expenses</h3>
+
+            <p>
+                Edit or delete existing expenses.
+            </p>
+
+        </a>
+
+
+        <!-- View Expenses -->
+        <a href="../expenses.html" class="action-card">
+
+            <div class="action-icon">
+                💸
+            </div>
+
+            <h3>View Expenses</h3>
+
+            <p>
+                View the festival expense records.
+            </p>
+
+        </a>
+
+
+        <!-- View Donations -->
+        <a href="../donation-history.html" class="action-card">
+
+            <div class="action-icon">
+                💰
+            </div>
+
+            <h3>View Donations</h3>
+
+            <p>
+                View donation records.
+            </p>
+
+        </a>
+
+
+        <!-- Transparency -->
+        <a href="../transparency.html" class="action-card">
+
+            <div class="action-icon">
+                📊
+            </div>
+
+            <h3>Transparency</h3>
+
+            <p>
+                View complete financial transparency.
+            </p>
+
+        </a>
+
+    </div>
+
+</section>
+
+
+        <!-- Admin Information -->
+        <section class="dashboard-section">
+
+            <div class="account-card">
+
+                <h2>Admin Account</h2>
+
+                <p>
+                    <strong>Name:</strong>
+                    <span id="adminName">Loading...</span>
+                </p>
+
+                <p>
+                    <strong>Email:</strong>
+                    <span id="adminEmail">Loading...</span>
+                </p>
+
+                <p>
+                    <strong>Role:</strong>
+                    <span id="adminRole">Admin</span>
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- JavaScript -->
+    <script
+        type="module"
+        src="../js/admin.js">
+    </script>
+
+</body>
+
+</html>
+

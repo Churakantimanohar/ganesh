@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>User Dashboard - Ganapathi Festival</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+
+    <header class="navbar">
+
+        <div class="logo">
+            🕉️ Ganapathi Festival
+        </div>
+
+
+        <nav>
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="transparency.html">
+                Transparency
+            </a>
+
+            <a href="expenses.html">
+                Expenses
+            </a>
+
+            <button id="logoutButton" class="nav-button">
+                Logout
+            </button>
+
+        </nav>
+
+    </header>
+
+
+    <!-- Dashboard -->
+
+    <main class="dashboard">
+
+        <section class="dashboard-header">
+
+            <h1>
+                Welcome, <span id="userName">User</span> 👋
+            </h1>
+
+            <p>
+                Welcome to the Ganapathi Festival Transparency System.
+            </p>
+
+        </section>
+
+
+        <!-- Financial Summary -->
+
+        <section class="summary">
+
+            <h2>
+                Festival Financial Summary
+            </h2>
+
+
+            <div class="summary-container">
+
+
+                <div class="summary-card">
+
+                    <h3>
+                        Total Donations
+                    </h3>
+
+                    <p id="totalDonations">
+                        ₹0
+                    </p>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <h3>
+                        Total Expenses
+                    </h3>
+
+                    <p id="totalExpenses">
+                        ₹0
+                    </p>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <h3>
+                        Remaining Balance
+                    </h3>
+
+                    <p id="remainingBalance">
+                        ₹0
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- User Actions -->
+
+        <section class="dashboard-actions">
+
+            <h2>
+                What would you like to do?
+            </h2>
+
+
+            <div class="action-container">
+
+
+                <a href="donations.html" class="action-card">
+
+                    <div class="action-icon">
+                        💰
+                    </div>
+
+                    <h3>
+                         Make a Donation
+                        
+                        </h3>
+
+                        <a href="donation-history.html" class="action-card">
+
+    <div class="action-icon">
+        📜
+    </div>
+
+    <h3>
+        My Donation History
+    </h3>
+
+    <p>
+        View all your previous donations.
+    </p>
+
+</a>
+
+                    <p>
+                        View your donation history.
+                    </p>
+
+                </a>
+
+
+                <a href="transparency.html" class="action-card">
+
+                    <div class="action-icon">
+                        📊
+                    </div>
+
+                    <h3>
+                        Transparency
+                    </h3>
+
+                    <p>
+                        View total donations and expenses.
+                    </p>
+
+                </a>
+
+
+                <a href="expenses.html" class="action-card">
+
+                    <div class="action-icon">
+                        🧾
+                    </div>
+
+                    <h3>
+                        Festival Expenses
+                    </h3>
+
+                    <p>
+                        See how the festival money is spent.
+                    </p>
+
+                </a>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- Account Information -->
+
+        <section class="account">
+
+            <h2>
+                My Account
+            </h2>
+
+
+            <div class="account-card">
+
+                <p>
+                    <strong>Name:</strong>
+
+                    <span id="accountName">
+                        Loading...
+                    </span>
+                </p>
+
+
+                <p>
+                    <strong>Email:</strong>
+
+                    <span id="accountEmail">
+                        Loading...
+                    </span>
+                </p>
+
+
+                <p>
+                    <strong>Account Type:</strong>
+
+                    <span>
+                        Community Member
+                    </span>
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+
+        <p>
+            © 2026 Ganapathi Festival Transparency System
+        </p>
+
+        <p>
+            Built for community transparency.
+        </p>
+
+    </footer>
+
+
+    <script type="module" src="js/dashboard.js"></script>
+
+</body>
+
+</html>

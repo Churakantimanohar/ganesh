@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Donations - Ganapathi Festival</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+
+    <!-- NAVBAR -->
+
+    <header class="navbar">
+
+        <div class="logo">
+            🕉️ Ganapathi Festival
+        </div>
+
+
+        <nav>
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="transparency.html">
+                Transparency
+            </a>
+
+            <a href="expenses.html">
+                Expenses
+            </a>
+
+            <button id="logoutButton" class="nav-button">
+                Logout
+            </button>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- DONATION PAGE -->
+
+    <main class="donation-page">
+
+
+        <section class="page-header">
+
+            <h1>
+                💰 Make a Donation
+            </h1>
+
+            <p>
+                Support the Ganapathi Festival.
+            </p>
+
+        </section>
+
+
+
+        <!-- DONATION FORM -->
+
+        <section class="donation-form-section">
+
+            <div class="donation-form-card">
+
+                <h2>
+                    Donation Details
+                </h2>
+
+
+                <form id="donationForm">
+
+
+                    <!-- NAME -->
+
+                    <label for="donorName">
+                        Donor Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="donorName"
+                        placeholder="Enter your name"
+                        required
+                    >
+
+
+                    <!-- AMOUNT -->
+
+                    <label for="amount">
+                        Donation Amount (₹)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        placeholder="Enter amount"
+                        min="1"
+                        step="0.01"
+                        required
+                    >
+
+
+                    <!-- PAYMENT METHOD -->
+
+                    <label for="paymentMethod">
+                        Payment Method
+                    </label>
+
+                    <select
+                        id="paymentMethod"
+                        required
+                    >
+
+                        <option value="">
+                            Select payment method
+                        </option>
+
+                        <option value="Cash">
+                            Cash
+                        </option>
+
+                        <option value="UPI">
+                            UPI
+                        </option>
+
+                        <option value="Bank Transfer">
+                            Bank Transfer
+                        </option>
+
+                    </select>
+
+
+                    <!-- FESTIVAL YEAR -->
+
+                    <label for="festivalYear">
+                        Festival Year
+                    </label>
+
+                    <select
+                        id="festivalYear"
+                        required
+                    >
+
+                        <option value="2026">
+                            Ganapathi Festival 2026
+                        </option>
+
+                    </select>
+
+
+                    <!-- SUBMIT -->
+
+                    <button
+                        type="submit"
+                        class="primary-button donation-button"
+                    >
+
+                        Submit Donation
+
+                    </button>
+
+
+                </form>
+
+
+                <p id="donationMessage"></p>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <footer>
+
+        <p>
+            © 2026 Ganapathi Festival Transparency System
+        </p>
+
+    </footer>
+
+
+
+    <script
+        type="module"
+        src="js/donations.js">
+    </script>
+
+</body>
+
+</html>

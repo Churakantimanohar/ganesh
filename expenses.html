@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Festival Expenses - Ganapathi Transparency</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <header class="navbar">
+
+        <div class="logo">
+            🕉️ Ganapathi Festival
+        </div>
+
+        <nav>
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="donation-history.html">
+                My Donations
+            </a>
+
+            <a href="transparency.html">
+                Transparency
+            </a>
+
+            <button id="logoutButton" class="nav-button">
+                Logout
+            </button>
+
+        </nav>
+
+    </header>
+
+
+    <!-- PAGE HEADER -->
+
+    <main>
+
+        <section class="page-header">
+
+            <h1>
+                🧾 Festival Expenses
+            </h1>
+
+            <p>
+                View how the festival funds are being spent.
+            </p>
+
+        </section>
+
+
+        <!-- EXPENSE SUMMARY -->
+
+        <section class="my-donation-summary">
+
+            <div class="summary-card">
+
+                <h3>
+                    Total Festival Expenses
+                </h3>
+
+                <p id="totalExpenses">
+                    ₹0
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- EXPENSE TABLE -->
+
+        <section class="donation-table-section">
+
+            <h2>
+                Expense Details
+            </h2>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Expense
+                            </th>
+
+                            <th>
+                                Category
+                            </th>
+
+                            <th>
+                                Amount
+                            </th>
+
+                            <th>
+                                Description
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="expenseTableBody">
+
+                        <tr>
+
+                            <td colspan="5">
+                                Loading expenses...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+
+        <p>
+            © 2026 Ganapathi Festival Transparency System
+        </p>
+
+        <p>
+            Built for community transparency.
+        </p>
+
+    </footer>
+
+
+    <script
+        type="module"
+        src="js/expenses.js">
+    </script>
+
+</body>
+
+</html>

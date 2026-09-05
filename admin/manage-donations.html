@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Donations - Ganapathi Transparency</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+
+        <div class="logo">
+            Ganapathi Transparency
+        </div>
+
+        <div class="nav-links">
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="expenses.html">
+                Add Expense
+            </a>
+
+            <a href="manage-expenses.html">
+                Manage Expenses
+            </a>
+
+            <a href="manage-donations.html">
+                Manage Donations
+            </a>
+
+            <a href="../expenses.html">
+                Public Expenses
+            </a>
+
+            <a href="#" id="logoutBtn">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- Main -->
+    <main class="dashboard-container">
+
+        <!-- Header -->
+        <section class="dashboard-header">
+
+            <h1>
+                Manage Donations
+            </h1>
+
+            <p>
+                View all donations received for the festival.
+            </p>
+
+        </section>
+
+
+        <!-- Controls -->
+        <section class="dashboard-section">
+
+            <div class="donation-controls">
+
+                <!-- Festival Year -->
+                <div class="year-filter">
+
+                    <label for="festivalYear">
+                        Festival Year
+                    </label>
+
+                    <select id="festivalYear">
+
+                        <option value="2026">
+                            2026
+                        </option>
+
+                        <option value="2027">
+                            2027
+                        </option>
+
+                        <option value="2028">
+                            2028
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Total -->
+                <div class="donation-total-box">
+
+                    <span>
+                        Total Donations
+                    </span>
+
+                    <strong id="totalDonations">
+                        ₹0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Donation Table -->
+        <section class="dashboard-section">
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Donor Name
+                            </th>
+
+                            <th>
+                                Amount
+                            </th>
+
+                            <th>
+                                Payment Method
+                            </th>
+
+                            <th>
+                                Festival
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="donationTableBody">
+
+                        <tr>
+
+                            <td colspan="6">
+                                Loading donations...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- JavaScript -->
+    <script
+        type="module"
+        src="../js/manage-donations.js">
+    </script>
+
+</body>
+
+</html>
