@@ -1,533 +1,369 @@
-
 import { db } from "./firebase-config.js";
 
 import {
-    collection,
-    getDocs,
-    query,
-    where
+  collection,
+  getDocs,
+  query,
+  where
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
-// =========================================
-// Elements
-// =========================================
+// ===============================
+// HTML ELEMENTS
+// ===============================
 
-const festivalYear =
-    document.getElementById("festivalYear");
+const festivalYear = document.getElementById("festivalYear");
 
-const totalDonations =
-    document.getElementById("totalDonations");
+const totalDonations = document.getElementById("totalDonations");
+const totalExpenses = document.getElementById("totalExpenses");
+const remainingBalance = document.getElementById("remainingBalance");
 
-const totalExpenses =
-    document.getElementById("totalExpenses");
-
-const remainingBalance =
-    document.getElementById("remainingBalance");
-
-const donationTableBody =
-    document.getElementById("donationTableBody");
-
-const expenseTableBody =
-    document.getElementById("expenseTableBody");
+const donationsTable = document.getElementById("donationTable");
+const expensesTable = document.getElementById("expenseTable");
 
 
-// =========================================
-// Load Transparency Data
-// =========================================
+// ===============================
+// LOAD TRANSPARENCY
+// ===============================
 
 async function loadTransparency(year) {
 
-    // Reset display
+  try {
 
-    totalDonations.textContent = "₹0";
+    // ===============================
+    // LOAD PUBLIC DONATIONS
+    // ===============================
 
-    totalExpenses.textContent = "₹0";
+    const donationsQuery = query(
+      collection(db, "publicDonations"),
+      where("festivalYear", "==", year)
+    );
 
-    remainingBalance.textContent = "₹0";
+    const donationsSnapshot = await getDocs(donationsQuery);
+
+    let donationTotal = 0;
+
+    const donations = [];
+
+    donationsSnapshot.forEach((doc) => {
+
+      const data = doc.data();
+
+      donationTotal += Number(data.amount || 0);
+
+      donations.push({
+        id: doc.id,
+        ...data
+      });
+
+    });
 
 
-    donationTableBody.innerHTML = `
+    // ===============================
+    // LOAD PUBLIC EXPENSES
+    // ===============================
+
+    const expensesQuery = query(
+      collection(db, "publicExpenses"),
+      where("festivalYear", "==", year)
+    );
+
+    const expensesSnapshot = await getDocs(expensesQuery);
+
+    let expenseTotal = 0;
+
+    const expenses = [];
+
+    expensesSnapshot.forEach((doc) => {
+
+      const data = doc.data();
+
+      expenseTotal += Number(data.amount || 0);
+
+      expenses.push({
+        id: doc.id,
+        ...data
+      });
+
+    });
+
+
+    // ===============================
+    // CALCULATE BALANCE
+    // ===============================
+
+    const balance = donationTotal - expenseTotal;
+
+
+    // ===============================
+    // DISPLAY SUMMARY
+    // ===============================
+
+    totalDonations.textContent =
+      formatCurrency(donationTotal);
+
+    totalExpenses.textContent =
+      formatCurrency(expenseTotal);
+
+    remainingBalance.textContent =
+      formatCurrency(balance);
+
+
+    // ===============================
+    // SORT DONATIONS
+    // ===============================
+
+    donations.sort((a, b) => {
+
+      const dateA = getDateValue(a.date);
+      const dateB = getDateValue(b.date);
+
+      return dateB - dateA;
+
+    });
+
+
+    // ===============================
+    // SORT EXPENSES
+    // ===============================
+
+    expenses.sort((a, b) => {
+
+      const dateA = getDateValue(a.date);
+      const dateB = getDateValue(b.date);
+
+      return dateB - dateA;
+
+    });
+
+
+    // ===============================
+    // DISPLAY DONATIONS
+    // ===============================
+
+    if (donations.length === 0) {
+
+      donationsTable.innerHTML = `
         <tr>
-            <td colspan="4">
-                Loading donations...
-            </td>
+          <td colspan="4">
+            No donations found.
+          </td>
         </tr>
-    `;
+      `;
 
+    } else {
 
-    expenseTableBody.innerHTML = `
-        <tr>
-            <td colspan="5">
-                Loading expenses...
+      donationsTable.innerHTML = donations.map((donation) => {
+
+        return `
+          <tr>
+
+            <td>
+              ${formatDate(donation.date)}
             </td>
-        </tr>
-    `;
 
+            <td>
+              ${escapeHTML(donation.donorName || "Anonymous")}
+            </td>
 
-    try {
+            <td>
+              ${formatCurrency(Number(donation.amount || 0))}
+            </td>
 
-        // =================================
-        // Donations
-        // =================================
+            <td>
+              ${escapeHTML(donation.paymentMethod || "-")}
+            </td>
 
-        const donationQuery =
-            query(
-                collection(
-                    db,
-                    "donations"
-                ),
-                where(
-                    "festivalYear",
-                    "==",
-                    year
-                )
-            );
-
-
-        const donationSnapshot =
-            await getDocs(
-                donationQuery
-            );
-
-
-        let donationTotal = 0;
-
-
-        donationTableBody.innerHTML = "";
-
-
-        if (donationSnapshot.empty) {
-
-            donationTableBody.innerHTML = `
-                <tr>
-                    <td colspan="4">
-                        No donations recorded.
-                    </td>
-                </tr>
-            `;
-
-        } else {
-
-            const donations = [];
-
-
-            donationSnapshot.forEach(
-                (donationDoc) => {
-
-                    const data =
-                        donationDoc.data();
-
-
-                    donations.push(data);
-
-                }
-            );
-
-
-            // Newest first
-
-            donations.sort(
-                (a, b) => {
-
-                    return (
-                        getDateValue(b.date) -
-                        getDateValue(a.date)
-                    );
-
-                }
-            );
-
-
-            donations.forEach(
-                (donation) => {
-
-                    const amount =
-                        Number(
-                            donation.amount
-                        ) || 0;
-
-
-                    donationTotal +=
-                        amount;
-
-
-                    const row =
-                        document.createElement(
-                            "tr"
-                        );
-
-
-                    row.innerHTML = `
-
-                        <td>
-                            ${formatDate(
-                                donation.date
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHtml(
-                                donation.donorName || "-"
-                            )}
-                        </td>
-
-                        <td>
-                            ${formatCurrency(
-                                amount
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHtml(
-                                donation.paymentMethod || "-"
-                            )}
-                        </td>
-
-                    `;
-
-
-                    donationTableBody.appendChild(
-                        row
-                    );
-
-                }
-            );
-
-        }
-
-
-        // =================================
-        // Expenses
-        // =================================
-
-        const expenseQuery =
-            query(
-                collection(
-                    db,
-                    "expenses"
-                ),
-                where(
-                    "festivalYear",
-                    "==",
-                    year
-                )
-            );
-
-
-        const expenseSnapshot =
-            await getDocs(
-                expenseQuery
-            );
-
-
-        let expenseTotal = 0;
-
-
-        expenseTableBody.innerHTML = "";
-
-
-        if (expenseSnapshot.empty) {
-
-            expenseTableBody.innerHTML = `
-                <tr>
-                    <td colspan="5">
-                        No expenses recorded.
-                    </td>
-                </tr>
-            `;
-
-        } else {
-
-            const expenses = [];
-
-
-            expenseSnapshot.forEach(
-                (expenseDoc) => {
-
-                    const data =
-                        expenseDoc.data();
-
-
-                    expenses.push(data);
-
-                }
-            );
-
-
-            // Newest first
-
-            expenses.sort(
-                (a, b) => {
-
-                    return (
-                        getDateValue(b.date) -
-                        getDateValue(a.date)
-                    );
-
-                }
-            );
-
-
-            expenses.forEach(
-                (expense) => {
-
-                    const amount =
-                        Number(
-                            expense.amount
-                        ) || 0;
-
-
-                    expenseTotal +=
-                        amount;
-
-
-                    const row =
-                        document.createElement(
-                            "tr"
-                        );
-
-
-                    row.innerHTML = `
-
-                        <td>
-                            ${formatDate(
-                                expense.date
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHtml(
-                                expense.title || "-"
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHtml(
-                                expense.category || "-"
-                            )}
-                        </td>
-
-                        <td>
-                            ${formatCurrency(
-                                amount
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHtml(
-                                expense.description || "-"
-                            )}
-                        </td>
-
-                    `;
-
-
-                    expenseTableBody.appendChild(
-                        row
-                    );
-
-                }
-            );
-
-        }
-
-
-        // =================================
-        // Financial Balance
-        // =================================
-
-        const balance =
-            donationTotal -
-            expenseTotal;
-
-
-        totalDonations.textContent =
-            formatCurrency(
-                donationTotal
-            );
-
-
-        totalExpenses.textContent =
-            formatCurrency(
-                expenseTotal
-            );
-
-
-        remainingBalance.textContent =
-            formatCurrency(
-                balance
-            );
-
-
-    } catch (error) {
-
-        console.error(
-            "Transparency loading error:",
-            error
-        );
-
-
-        donationTableBody.innerHTML = `
-            <tr>
-                <td colspan="4">
-                    Unable to load donation information.
-                </td>
-            </tr>
+          </tr>
         `;
 
-
-        expenseTableBody.innerHTML = `
-            <tr>
-                <td colspan="5">
-                    Unable to load expense information.
-                </td>
-            </tr>
-        `;
+      }).join("");
 
     }
+
+
+    // ===============================
+    // DISPLAY EXPENSES
+    // ===============================
+
+    if (expenses.length === 0) {
+
+      expensesTable.innerHTML = `
+        <tr>
+          <td colspan="5">
+            No expenses found.
+          </td>
+        </tr>
+      `;
+
+    } else {
+
+      expensesTable.innerHTML = expenses.map((expense) => {
+
+        return `
+          <tr>
+
+            <td>
+              ${formatDate(expense.date)}
+            </td>
+
+            <td>
+              ${escapeHTML(expense.title || "-")}
+            </td>
+
+            <td>
+              ${escapeHTML(expense.category || "-")}
+            </td>
+
+            <td>
+              ${formatCurrency(Number(expense.amount || 0))}
+            </td>
+
+            <td>
+              ${escapeHTML(expense.description || "-")}
+            </td>
+
+          </tr>
+        `;
+
+      }).join("");
+
+    }
+
+  } catch (error) {
+
+    console.error("Error loading transparency:", error);
+
+    totalDonations.textContent = "₹0.00";
+    totalExpenses.textContent = "₹0.00";
+    remainingBalance.textContent = "₹0.00";
+
+    donationsTable.innerHTML = `
+      <tr>
+        <td colspan="4">
+          Unable to load donations.
+        </td>
+      </tr>
+    `;
+
+    expensesTable.innerHTML = `
+      <tr>
+        <td colspan="5">
+          Unable to load expenses.
+        </td>
+      </tr>
+    `;
+
+  }
 
 }
 
 
-// =========================================
-// Festival Year Change
-// =========================================
+// ===============================
+// FESTIVAL YEAR CHANGE
+// ===============================
 
-festivalYear.addEventListener(
-    "change",
-    () => {
+festivalYear.addEventListener("change", () => {
 
-        loadTransparency(
-            festivalYear.value
-        );
+  loadTransparency(festivalYear.value);
 
-    }
-);
+});
 
 
-// =========================================
-// Helpers
-// =========================================
+// ===============================
+// FORMAT CURRENCY
+// ===============================
 
 function formatCurrency(amount) {
 
-    return new Intl.NumberFormat(
-        "en-IN",
-        {
-            style: "currency",
-            currency: "INR",
-            maximumFractionDigits: 2
-        }
-    ).format(amount);
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    minimumFractionDigits: 2
+  }).format(amount);
 
 }
 
 
-function formatDate(value) {
+// ===============================
+// FORMAT DATE
+// ===============================
 
-    const date =
-        convertToDate(value);
+function formatDate(dateValue) {
 
+  if (!dateValue) {
+    return "-";
+  }
 
-    if (!date) {
+  let date;
 
-        return "-";
+  if (dateValue?.toDate) {
 
-    }
+    date = dateValue.toDate();
 
+  } else if (dateValue instanceof Date) {
 
-    return date.toLocaleDateString(
-        "en-IN"
-    );
+    date = dateValue;
 
-}
+  } else {
 
+    date = new Date(dateValue);
 
-function getDateValue(value) {
+  }
 
-    const date =
-        convertToDate(value);
+  if (isNaN(date.getTime())) {
+    return "-";
+  }
 
-
-    return date
-        ? date.getTime()
-        : 0;
-
-}
-
-
-function convertToDate(value) {
-
-    if (!value) {
-
-        return null;
-
-    }
-
-
-    if (
-        typeof value.toDate ===
-        "function"
-    ) {
-
-        return value.toDate();
-
-    }
-
-
-    if (value instanceof Date) {
-
-        return value;
-
-    }
-
-
-    const date =
-        new Date(value);
-
-
-    return isNaN(
-        date.getTime()
-    )
-        ? null
-        : date;
+  return date.toLocaleDateString("en-IN");
 
 }
 
 
-// Prevent HTML injection
-function escapeHtml(value) {
+// ===============================
+// GET DATE VALUE
+// ===============================
 
-    return String(value)
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-        .replaceAll(
-            "'",
-            "&#039;"
-        );
+function getDateValue(dateValue) {
+
+  if (!dateValue) {
+    return 0;
+  }
+
+  if (dateValue?.toDate) {
+    return dateValue.toDate().getTime();
+  }
+
+  if (dateValue instanceof Date) {
+    return dateValue.getTime();
+  }
+
+  const date = new Date(dateValue);
+
+  return isNaN(date.getTime())
+    ? 0
+    : date.getTime();
 
 }
 
 
-// =========================================
-// Initial Load
-// =========================================
+// ===============================
+// HTML SECURITY
+// ===============================
 
-loadTransparency(
-    festivalYear.value
-);
+function escapeHTML(value) {
+
+  const div = document.createElement("div");
+
+  div.textContent = value;
+
+  return div.innerHTML;
+
+}
+
+
+// ===============================
+// INITIAL LOAD
+// ===============================
+
+loadTransparency(festivalYear.value);

@@ -1,4 +1,3 @@
-
 import { auth, db } from "./firebase-config.js";
 
 import {
@@ -12,7 +11,10 @@ import {
     collection,
     getDocs,
     query,
-    where
+    where,
+    updateDoc,
+    addDoc,
+    runTransaction
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
@@ -34,7 +36,7 @@ const logoutBtn =
 
 
 // =========================================
-// Check Admin Access
+// CHECK ADMIN
 // =========================================
 
 onAuthStateChanged(auth, async (user) => {
@@ -51,7 +53,12 @@ onAuthStateChanged(auth, async (user) => {
     try {
 
         const userRef =
-            doc(db, "users", user.uid);
+            doc(
+                db,
+                "users",
+                user.uid
+            );
+
 
         const userSnap =
             await getDoc(userRef);
@@ -89,11 +96,6 @@ onAuthStateChanged(auth, async (user) => {
         }
 
 
-        console.log(
-            "Admin access granted."
-        );
-
-
         loadDonations(
             festivalYear.value
         );
@@ -115,14 +117,14 @@ onAuthStateChanged(auth, async (user) => {
 
 
 // =========================================
-// Load Donations
+// LOAD DONATIONS
 // =========================================
 
 async function loadDonations(year) {
 
     donationTableBody.innerHTML = `
         <tr>
-            <td colspan="6">
+            <td colspan="7">
                 Loading donations...
             </td>
         </tr>
@@ -137,6 +139,7 @@ async function loadDonations(year) {
                     db,
                     "donations"
                 ),
+
                 where(
                     "festivalYear",
                     "==",
@@ -162,7 +165,7 @@ async function loadDonations(year) {
 
             donationTableBody.innerHTML = `
                 <tr>
-                    <td colspan="6">
+                    <td colspan="7">
                         No donations found.
                     </td>
                 </tr>
@@ -186,15 +189,20 @@ async function loadDonations(year) {
 
 
                 donations.push({
-                    id: donationDoc.id,
+
+                    id:
+                        donationDoc.id,
+
                     ...data
+
                 });
 
             }
         );
 
 
-        // Sort newest first
+        // Newest first
+
         donations.sort(
             (a, b) => {
 
@@ -223,6 +231,44 @@ async function loadDonations(year) {
                     document.createElement(
                         "tr"
                     );
+
+
+                const status =
+                    donation.status ||
+                    "pending";
+
+
+                let actionHTML;
+
+
+                if (
+                    status ===
+                    "pending"
+                ) {
+
+                    actionHTML = `
+
+                        <button
+                            class="btn-primary verify-donation-btn"
+                            data-id="${donation.id}">
+
+                            Verify & Publish
+
+                        </button>
+
+                    `;
+
+                } else {
+
+                    actionHTML = `
+
+                        <span class="published-label">
+                            Published
+                        </span>
+
+                    `;
+
+                }
 
 
                 row.innerHTML = `
@@ -259,8 +305,12 @@ async function loadDonations(year) {
 
                     <td>
                         ${escapeHtml(
-                            donation.status || "-"
+                            status
                         )}
+                    </td>
+
+                    <td>
+                        ${actionHTML}
                     </td>
 
                 `;
@@ -278,6 +328,32 @@ async function loadDonations(year) {
             formatCurrency(total);
 
 
+        // =========================================
+        // VERIFY BUTTONS
+        // =========================================
+
+        document
+            .querySelectorAll(
+                ".verify-donation-btn"
+            )
+            .forEach(
+                (button) => {
+
+                    button.addEventListener(
+                        "click",
+                        () => {
+
+                            verifyDonation(
+                                button.dataset.id
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+
     } catch (error) {
 
         console.error(
@@ -288,7 +364,7 @@ async function loadDonations(year) {
 
         donationTableBody.innerHTML = `
             <tr>
-                <td colspan="6">
+                <td colspan="7">
                     Unable to load donations.
                 </td>
             </tr>
@@ -300,7 +376,171 @@ async function loadDonations(year) {
 
 
 // =========================================
-// Festival Year Change
+// VERIFY + PUBLISH DONATION
+// =========================================
+
+async function verifyDonation(
+    donationId
+) {
+
+    const confirmed =
+        confirm(
+            "Verify this donation and publish it to Transparency?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+    }
+
+
+    try {
+
+        const donationRef =
+            doc(
+                db,
+                "donations",
+                donationId
+            );
+
+
+        // =========================================
+        // FIRESTORE TRANSACTION
+        // =========================================
+
+        await runTransaction(
+            db,
+            async (transaction) => {
+
+                const donationSnap =
+                    await transaction.get(
+                        donationRef
+                    );
+
+
+                if (
+                    !donationSnap.exists()
+                ) {
+
+                    throw new Error(
+                        "Donation no longer exists."
+                    );
+
+                }
+
+
+                const donation =
+                    donationSnap.data();
+
+
+                // Already verified
+
+                if (
+                    donation.status ===
+                    "confirmed"
+                ) {
+
+                    throw new Error(
+                        "This donation is already verified."
+                    );
+
+                }
+
+
+                // =========================================
+                // CREATE PUBLIC DONATION
+                // =========================================
+
+                const publicDonationRef =
+                    doc(
+                        collection(
+                            db,
+                            "publicDonations"
+                        )
+                    );
+
+
+                const publicDonation = {
+
+                    donorName:
+                        donation.donorName ||
+                        "Anonymous",
+
+                    amount:
+                        Number(
+                            donation.amount || 0
+                        ),
+
+                    paymentMethod:
+                        donation.paymentMethod ||
+                        "",
+
+                    festivalYear:
+                        donation.festivalYear,
+
+                    date:
+                        donation.date ||
+                        null,
+
+                    status:
+                        "confirmed"
+
+                };
+
+
+                transaction.set(
+                    publicDonationRef,
+                    publicDonation
+                );
+
+
+                // =========================================
+                // UPDATE PRIVATE DONATION
+                // =========================================
+
+                transaction.update(
+                    donationRef,
+                    {
+                        status:
+                            "confirmed"
+                    }
+                );
+
+            }
+        );
+
+
+        alert(
+            "Donation verified and published successfully! ✅"
+        );
+
+
+        loadDonations(
+            festivalYear.value
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Verification error:",
+            error
+        );
+
+
+        alert(
+            "Unable to verify donation.\n\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+// =========================================
+// FESTIVAL YEAR CHANGE
 // =========================================
 
 festivalYear.addEventListener(
@@ -316,7 +556,7 @@ festivalYear.addEventListener(
 
 
 // =========================================
-// Logout
+// LOGOUT
 // =========================================
 
 logoutBtn.addEventListener(
@@ -347,7 +587,7 @@ logoutBtn.addEventListener(
 
 
 // =========================================
-// Helpers
+// HELPERS
 // =========================================
 
 function formatCurrency(amount) {
@@ -436,30 +676,37 @@ function convertToDate(value) {
 }
 
 
-// Prevent HTML injection
+// =========================================
+// HTML SECURITY
+// =========================================
+
 function escapeHtml(value) {
 
     return String(value)
+
         .replaceAll(
             "&",
             "&amp;"
         )
+
         .replaceAll(
             "<",
             "&lt;"
         )
+
         .replaceAll(
             ">",
             "&gt;"
         )
+
         .replaceAll(
             '"',
             "&quot;"
         )
+
         .replaceAll(
             "'",
             "&#039;"
         );
 
 }
-

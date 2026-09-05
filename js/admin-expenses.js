@@ -1,121 +1,242 @@
 import { auth, db } from "./firebase-config.js";
 
 import {
-  onAuthStateChanged,
-  signOut
+    onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 import {
-  doc,
-  getDoc,
-  collection,
-  addDoc,
-  serverTimestamp
+    collection,
+    addDoc,
+    doc,
+    getDoc,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-// Elements
+
+// ===============================
+// HTML ELEMENTS
+// ===============================
+
 const expenseForm = document.getElementById("expenseForm");
-const message = document.getElementById("message");
-const logoutBtn = document.getElementById("logoutBtn");
+
+const expenseName = document.getElementById("expenseName");
+const category = document.getElementById("category");
+const amount = document.getElementById("amount");
+const description = document.getElementById("description");
+const festivalYear = document.getElementById("festivalYear");
+const expenseDate = document.getElementById("expenseDate");
+
 
 // ===============================
-// Check Login & Admin Role
+// CHECK ADMIN LOGIN
 // ===============================
+
 onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = "../login.html";
-    return;
-  }
 
-  try {
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
+    if (!user) {
 
-    if (!userSnap.exists()) {
-      alert("User profile not found.");
-      await signOut(auth);
-      window.location.href = "../login.html";
-      return;
+        window.location.href = "../login.html";
+        return;
+
     }
 
-    const userData = userSnap.data();
+    try {
 
-    if (userData.role !== "admin") {
-      alert("Access denied. Admin account required.");
-      window.location.href = "../dashboard.html";
-      return;
+        const userRef = doc(db, "users", user.uid);
+
+        const userSnapshot = await getDoc(userRef);
+
+        if (!userSnapshot.exists()) {
+
+            await auth.signOut();
+
+            window.location.href = "../login.html";
+
+            return;
+        }
+
+        const userData = userSnapshot.data();
+
+        if (userData.role !== "admin") {
+
+            alert("Access denied. Admin account required.");
+
+            window.location.href = "../dashboard.html";
+
+            return;
+        }
+
+    } catch (error) {
+
+        console.error("Error checking admin:", error);
+
+        alert("Unable to verify admin access.");
+
+        window.location.href = "../dashboard.html";
     }
 
-    console.log("Admin access granted.");
-  } catch (error) {
-    console.error("Admin verification error:", error);
-    alert("Unable to verify admin access.");
-    window.location.href = "../dashboard.html";
-  }
 });
 
+
 // ===============================
-// Add Expense
+// ADD EXPENSE
 // ===============================
+
 expenseForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
 
-  const user = auth.currentUser;
+    event.preventDefault();
 
-  if (!user) {
-    alert("Please login first.");
-    return;
-  }
 
-  const expenseName = document.getElementById("expenseName").value.trim();
-  const category = document.getElementById("category").value;
-  const amount = Number(document.getElementById("amount").value);
-  const description = document.getElementById("description").value.trim();
-  const festivalYear = document.getElementById("festivalYear").value;
-  const expenseDate = document.getElementById("expenseDate").value;
+    // Get values
+    const title = expenseName.value.trim();
 
-  if (!expenseName || !category || amount <= 0 || !expenseDate) {
-    message.style.color = "red";
-    message.textContent = "Please fill all required fields correctly.";
-    return;
-  }
+    const expenseCategory = category.value.trim();
 
-  try {
-    await addDoc(collection(db, "expenses"), {
-      title: expenseName,
-      category: category,
-      amount: amount,
-      description: description,
-      festivalYear: festivalYear,
+    const expenseAmount = Number(amount.value);
 
-      // Keep this field name as 'date'
-      date: new Date(expenseDate),
+    const expenseDescription = description.value.trim();
 
-      createdBy: user.uid,
-      createdAt: serverTimestamp()
-    });
+    const year = festivalYear.value;
 
-    message.style.color = "green";
-    message.textContent = "Expense added successfully! ✅";
+    const selectedDate = expenseDate.value;
 
-    expenseForm.reset();
-  } catch (error) {
-    console.error("Error adding expense:", error);
-    message.style.color = "red";
-    message.textContent = "Failed to add expense: " + error.message;
-  }
-});
 
-// ===============================
-// Logout
-// ===============================
-logoutBtn.addEventListener("click", async (event) => {
-  event.preventDefault();
+    // ===============================
+    // VALIDATION
+    // ===============================
 
-  try {
-    await signOut(auth);
-    window.location.href = "../login.html";
-  } catch (error) {
-    console.error("Logout error:", error);
-  }
+    if (!title) {
+
+        alert("Please enter the expense name.");
+        return;
+
+    }
+
+    if (!expenseCategory) {
+
+        alert("Please enter the category.");
+        return;
+
+    }
+
+    if (!expenseAmount || expenseAmount <= 0) {
+
+        alert("Please enter a valid amount.");
+        return;
+
+    }
+
+    if (!year) {
+
+        alert("Please select a festival year.");
+        return;
+
+    }
+
+    if (!selectedDate) {
+
+        alert("Please select the expense date.");
+        return;
+
+    }
+
+
+    // ===============================
+    // CHECK CURRENT USER
+    // ===============================
+
+    const user = auth.currentUser;
+
+    if (!user) {
+
+        alert("Please login first.");
+
+        window.location.href = "../login.html";
+
+        return;
+    }
+
+
+    try {
+
+        // ===============================
+        // CREATE PRIVATE EXPENSE
+        // ===============================
+
+        const expenseData = {
+
+            title: title,
+
+            category: expenseCategory,
+
+            amount: expenseAmount,
+
+            description: expenseDescription,
+
+            festivalYear: year,
+
+            date: new Date(selectedDate),
+
+            createdBy: user.uid,
+
+            createdAt: serverTimestamp()
+
+        };
+
+
+        const expenseRef = await addDoc(
+            collection(db, "expenses"),
+            expenseData
+        );
+
+
+        // ===============================
+        // CREATE PUBLIC EXPENSE
+        // ===============================
+
+        const publicExpenseData = {
+
+            title: title,
+
+            category: expenseCategory,
+
+            amount: expenseAmount,
+
+            description: expenseDescription,
+
+            festivalYear: year,
+
+            date: new Date(selectedDate)
+
+        };
+
+
+        await addDoc(
+            collection(db, "publicExpenses"),
+            publicExpenseData
+        );
+
+
+        // ===============================
+        // SUCCESS
+        // ===============================
+
+        alert("Expense added successfully! ✅");
+
+
+        // Clear form
+        expenseForm.reset();
+
+
+    } catch (error) {
+
+        console.error("Error adding expense:", error);
+
+        alert(
+            "Unable to add expense.\n\n" +
+            error.message
+        );
+
+    }
+
 });

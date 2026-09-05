@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Migrate Expenses - Ganapathi Transparency</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <div class="logo">
+                Ganapathi Transparency
+            </div>
+
+            <div class="nav-links">
+
+                <a href="dashboard.html">
+                    Admin Dashboard
+                </a>
+
+                <a href="expenses.html">
+                    Add Expense
+                </a>
+
+                <a href="../transparency.html">
+                    Transparency
+                </a>
+
+                <a href="#" id="logoutBtn">
+                    Logout
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <main class="dashboard-container">
+
+        <section class="dashboard-header">
+
+            <h1>
+                Publish Existing Expenses
+            </h1>
+
+            <p>
+                Copy existing festival expenses to the public transparency records.
+            </p>
+
+        </section>
+
+
+        <section class="dashboard-section">
+
+            <div class="form-card">
+
+                <div class="form-group">
+
+                    <label for="festivalYear">
+                        Festival Year
+                    </label>
+
+                    <select id="festivalYear">
+
+                        <option value="2026">
+                            2026
+                        </option>
+
+                        <option value="2027">
+                            2027
+                        </option>
+
+                        <option value="2028">
+                            2028
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    id="migrateBtn"
+                    class="btn-primary"
+                    type="button"
+                >
+                    Publish Expenses
+                </button>
+
+
+                <p id="message"></p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script
+        type="module"
+        src="../js/migrate-expenses.js">
+    </script>
+
+</body>
+
+</html>

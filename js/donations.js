@@ -1,11 +1,9 @@
 import { auth, db } from "./firebase-config.js";
 
-
 import {
     onAuthStateChanged,
     signOut
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
 
 import {
     collection,
@@ -14,22 +12,17 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
-
 const donationForm =
     document.getElementById("donationForm");
 
-
 const message =
     document.getElementById("donationMessage");
-
 
 const logoutButton =
     document.getElementById("logoutButton");
 
 
-
 let currentUser = null;
-
 
 
 // ========================================
@@ -40,13 +33,10 @@ onAuthStateChanged(auth, (user) => {
 
     if (!user) {
 
-        window.location.href =
-            "login.html";
+        window.location.href = "login.html";
 
         return;
-
     }
-
 
     currentUser = user;
 
@@ -56,7 +46,6 @@ onAuthStateChanged(auth, (user) => {
     );
 
 });
-
 
 
 // ========================================
@@ -70,15 +59,12 @@ donationForm.addEventListener(
         event.preventDefault();
 
 
-        // Make sure user is logged in
-
         if (!currentUser) {
 
             message.textContent =
                 "Please login before donating.";
 
             return;
-
         }
 
 
@@ -109,10 +95,18 @@ donationForm.addEventListener(
                 .value;
 
 
+        // ========================================
+        // VALIDATE
+        // ========================================
 
-        // ========================================
-        // VALIDATE AMOUNT
-        // ========================================
+        if (!donorName) {
+
+            message.textContent =
+                "Please enter your name.";
+
+            return;
+        }
+
 
         if (amount <= 0) {
 
@@ -120,15 +114,22 @@ donationForm.addEventListener(
                 "Donation amount must be greater than ₹0.";
 
             return;
-
         }
 
+
+        if (!paymentMethod) {
+
+            message.textContent =
+                "Please select a payment method.";
+
+            return;
+        }
 
 
         try {
 
             // ========================================
-            // SAVE DONATION
+            // SAVE PRIVATE DONATION
             // ========================================
 
             await addDoc(
@@ -153,8 +154,9 @@ donationForm.addEventListener(
                     date:
                         serverTimestamp(),
 
+                    // Admin must verify first
                     status:
-                        "confirmed"
+                        "pending"
 
                 }
             );
@@ -165,7 +167,8 @@ donationForm.addEventListener(
             // ========================================
 
             message.textContent =
-                "Donation recorded successfully! 🙏";
+                "Donation submitted successfully! " +
+                "It will appear in Transparency after admin verification. 🙏";
 
 
             donationForm.reset();
@@ -186,7 +189,6 @@ donationForm.addEventListener(
 
     }
 );
-
 
 
 // ========================================

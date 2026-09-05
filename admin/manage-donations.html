@@ -1,24 +1,35 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Manage Donations - Ganapathi Transparency</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="../css/style.css">
+    <title>
+        Manage Donations - Ganapathi Transparency
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css">
+
 </head>
 
 <body>
 
+
     <!-- Navbar -->
+
     <nav class="navbar">
 
         <div class="logo">
             Ganapathi Transparency
         </div>
+
 
         <div class="nav-links">
 
@@ -38,12 +49,16 @@
                 Manage Donations
             </a>
 
-            <a href="../expenses.html">
-                Public Expenses
+            <a href="../transparency.html">
+                Transparency
             </a>
 
-            <a href="#" id="logoutBtn">
+            <a
+                href="#"
+                id="logoutBtn">
+
                 Logout
+
             </a>
 
         </div>
@@ -52,9 +67,12 @@
 
 
     <!-- Main -->
+
     <main class="dashboard-container">
 
+
         <!-- Header -->
+
         <section class="dashboard-header">
 
             <h1>
@@ -62,18 +80,20 @@
             </h1>
 
             <p>
-                View all donations received for the festival.
+                Verify donations and publish them
+                to the public transparency page.
             </p>
 
         </section>
 
 
         <!-- Controls -->
+
         <section class="dashboard-section">
 
             <div class="donation-controls">
 
-                <!-- Festival Year -->
+
                 <div class="year-filter">
 
                     <label for="festivalYear">
@@ -99,7 +119,6 @@
                 </div>
 
 
-                <!-- Total -->
                 <div class="donation-total-box">
 
                     <span>
@@ -118,6 +137,7 @@
 
 
         <!-- Donation Table -->
+
         <section class="dashboard-section">
 
             <div class="table-container">
@@ -152,15 +172,20 @@
                                 Status
                             </th>
 
+                            <th>
+                                Action
+                            </th>
+
                         </tr>
 
                     </thead>
+
 
                     <tbody id="donationTableBody">
 
                         <tr>
 
-                            <td colspan="6">
+                            <td colspan="7">
                                 Loading donations...
                             </td>
 
@@ -174,10 +199,10 @@
 
         </section>
 
+
     </main>
 
 
-    <!-- JavaScript -->
     <script
         type="module"
         src="../js/manage-donations.js">
