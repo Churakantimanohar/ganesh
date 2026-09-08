@@ -8,7 +8,9 @@ import {
 import {
     collection,
     addDoc,
-    serverTimestamp
+    serverTimestamp,
+    doc,
+    getDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
@@ -21,8 +23,13 @@ const message =
 const logoutButton =
     document.getElementById("logoutButton");
 
+const paymentMethodSelect = document.getElementById("paymentMethod");
+const upiScanner = document.getElementById("upiScanner");
+const upiScannerImage = document.getElementById("upiScannerImage");
+
 
 let currentUser = null;
+let upiImageUrl = "";
 
 
 // ========================================
@@ -40,11 +47,38 @@ onAuthStateChanged(auth, (user) => {
 
     currentUser = user;
 
+    loadUpiScanner();
+
     console.log(
         "Logged in user:",
         currentUser.uid
     );
 
+});
+
+async function loadUpiScanner() {
+    try {
+        const snapshot = await getDoc(doc(db, "settings", "payment"));
+        upiImageUrl = snapshot.exists() ? snapshot.data().upiImageUrl || "" : "";
+        updateUpiScanner();
+    } catch (error) {
+        console.error("Error loading UPI scanner:", error);
+    }
+}
+
+function updateUpiScanner() {
+    const shouldShow = paymentMethodSelect.value === "UPI" && upiImageUrl;
+    upiScanner.hidden = !shouldShow;
+    if (shouldShow) {
+        upiScannerImage.src = upiImageUrl;
+    } else {
+        upiScannerImage.removeAttribute("src");
+    }
+}
+
+paymentMethodSelect.addEventListener("change", updateUpiScanner);
+upiScannerImage.addEventListener("error", () => {
+    upiScanner.hidden = true;
 });
 
 

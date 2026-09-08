@@ -4,7 +4,9 @@ import { auth, db } from "./firebase-config.js";
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
-    signOut
+    signOut,
+    GoogleAuthProvider,
+    signInWithPopup
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 
@@ -53,6 +55,11 @@ if (registerForm) {
                     .getElementById("password")
                     .value;
 
+            const confirmPassword =
+                document
+                    .getElementById("confirmPassword")
+                    .value;
+
 
             const message =
                 document
@@ -60,6 +67,11 @@ if (registerForm) {
 
 
             try {
+
+                if (password !== confirmPassword) {
+                    message.textContent = "Passwords do not match.";
+                    return;
+                }
 
                 // Create Firebase account
 
@@ -147,6 +159,39 @@ if (registerForm) {
     );
 
 }
+
+async function signInWithGoogle(message) {
+    try {
+        const result = await signInWithPopup(auth, new GoogleAuthProvider());
+        const userRef = doc(db, "users", result.user.uid);
+        let profile = await getDoc(userRef);
+
+        if (!profile.exists()) {
+            await setDoc(userRef, {
+                name: result.user.displayName || "Community member",
+                email: result.user.email || "",
+                role: "user",
+                createdAt: serverTimestamp()
+            });
+            profile = await getDoc(userRef);
+        }
+
+        message.textContent = "Login successful!";
+        window.location.href = profile.data().role === "admin"
+            ? "admin/dashboard.html"
+            : "dashboard.html";
+    } catch (error) {
+        console.error("Google sign-in error:", error);
+        message.textContent = "Google sign-in was not completed. Please try again.";
+    }
+}
+
+document.querySelectorAll("[data-google-login]").forEach((button) => {
+    button.addEventListener("click", () => {
+        const message = document.getElementById(button.dataset.message || "loginMessage");
+        signInWithGoogle(message);
+    });
+});
 
 
 

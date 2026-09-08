@@ -8,16 +8,17 @@
 
     <title>Transparency - Ganapathi Festival</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=transparency-ui-2">
 </head>
 
-<body>
+<body class="transparency-page">
 
     <!-- Navbar -->
     <nav class="navbar">
 
         <div class="logo">
-            Ganapathi Transparency
+            <img class="brand-logo" src="assets/club-emblem.png" alt="Reddy's Youth Associations club emblem">
+            <span>Reddy's Youth Associations</span>
         </div>
 
         <div class="nav-links">
@@ -40,29 +41,25 @@
 
 
     <!-- Header -->
-    <section class="page-header">
+    <header class="page-header transparency-hero">
+        <div class="transparency-hero-content">
+            <p class="hero-eyebrow">Reddy's Youth Associations · Public Ledger</p>
+            <h1>Festival finances,<br><span>open to everyone.</span></h1>
+            <p class="hero-copy">Follow every contribution and every festival expense in one clear, public record.</p>
+        </div>
+        <img class="hero-club-emblem" src="assets/club-emblem.png" alt="Reddy's Youth Associations club emblem">
+    </header>
 
-        <h1>
-            Festival Transparency
-        </h1>
-
-        <p>
-            See how much was collected and how the festival funds were spent.
-        </p>
-
-    </section>
-
-
-    <!-- Festival Selection -->
-    <section class="dashboard-section">
-
-        <div class="festival-selector">
-
-            <label for="festivalYear">
-                Festival Year
-            </label>
-
-            <select id="festivalYear">
+    <main class="transparency-main">
+        <!-- Festival Selection -->
+        <section class="year-panel" aria-label="Festival year selection">
+            <div>
+                <p class="panel-label">Viewing financial records for</p>
+                <h2>Ganapathi Festival</h2>
+            </div>
+            <div class="festival-selector">
+                <label for="festivalYear">Festival Year</label>
+                <select id="festivalYear">
 
                 <option value="2026">
                     2026
@@ -76,65 +73,47 @@
                     2028
                 </option>
 
-            </select>
-
-        </div>
-
-    </section>
+                </select>
+            </div>
+        </section>
 
 
     <!-- Financial Summary -->
-    <section class="summary-grid">
+        <section class="summary-grid transparency-summary" aria-label="Festival financial summary">
+            <article class="summary-card donation-card">
+                <span class="summary-icon" aria-hidden="true">↗</span>
+                <p class="summary-label">Total Donations</p>
+                <p id="totalDonations">₹0</p>
+                <span class="summary-note">Community contributions</span>
+            </article>
 
-        <div class="summary-card">
+            <article class="summary-card expense-card">
+                <span class="summary-icon" aria-hidden="true">↙</span>
+                <p class="summary-label">Total Expenses</p>
+                <p id="totalExpenses">₹0</p>
+                <span class="summary-note">Festival spending</span>
+            </article>
 
-            <h3>
-                Total Donations
-            </h3>
-
-            <p id="totalDonations">
-                ₹0
-            </p>
-
-        </div>
-
-
-        <div class="summary-card">
-
-            <h3>
-                Total Expenses
-            </h3>
-
-            <p id="totalExpenses">
-                ₹0
-            </p>
-
-        </div>
-
-
-        <div class="summary-card">
-
-            <h3>
-                Remaining Balance
-            </h3>
-
-            <p id="remainingBalance">
-                ₹0
-            </p>
-
-        </div>
-
-    </section>
+            <article class="summary-card balance-card">
+                <span class="summary-icon" aria-hidden="true">₹</span>
+                <p class="summary-label">Remaining Balance</p>
+                <p id="remainingBalance">₹0</p>
+                <span class="summary-note">Available festival funds</span>
+            </article>
+        </section>
 
 
     <!-- Donations -->
-    <section class="dashboard-section">
+        <section class="dashboard-section ledger-section">
+            <div class="ledger-heading">
+                <div>
+                    <p class="ledger-kicker">Community support</p>
+                    <h2>Donation record</h2>
+                </div>
+                <p>Every contribution is listed here for the selected festival year.</p>
+            </div>
 
-        <h2>
-            Donations
-        </h2>
-
-        <div class="table-container">
+            <div class="table-container ledger-table-container">
 
             <table>
 
@@ -176,19 +155,24 @@
 
             </table>
 
+                <img class="table-stamp-watermark" src="assets/association-stamp.png" alt="" aria-hidden="true">
+
         </div>
 
-    </section>
+        </section>
 
 
     <!-- Expenses -->
-    <section class="dashboard-section">
+        <section class="dashboard-section ledger-section">
+            <div class="ledger-heading">
+                <div>
+                    <p class="ledger-kicker">Festival spending</p>
+                    <h2>Expense record</h2>
+                </div>
+                <p>See how donations are used to make the celebration happen.</p>
+            </div>
 
-        <h2>
-            Expenses
-        </h2>
-
-        <div class="table-container">
+            <div class="table-container ledger-table-container expense-ledger-table">
 
             <table>
 
@@ -234,16 +218,19 @@
 
             </table>
 
+                <img class="table-stamp-watermark" src="assets/association-stamp.png" alt="" aria-hidden="true">
+
         </div>
 
-    </section>
+        </section>
+    </main>
 
 
     <!-- Footer -->
     <footer>
 
         <p>
-            Ganapathi Festival Transparency System
+            Reddy's Youth Associations
         </p>
 
         <p>
@@ -258,6 +245,7 @@
         type="module"
         src="js/transparency.js">
     </script>
+    <script type="module" src="js/site.js"></script>
 
 </body>
 

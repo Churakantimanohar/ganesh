@@ -7,7 +7,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Festival Expenses - Ganapathi Transparency</title>
+    <title>Festival Expenses - Reddy's Youth Associations</title>
 
     <link rel="stylesheet" href="css/style.css">
 
@@ -20,7 +20,8 @@
     <header class="navbar">
 
         <div class="logo">
-            🕉️ Ganapathi Festival
+            <img class="brand-logo" src="assets/logo.svg" alt="Reddy's Youth Associations logo">
+            <span>Reddy's Youth Associations</span>
         </div>
 
         <nav>
@@ -70,6 +71,15 @@
         <!-- EXPENSE SUMMARY -->
 
         <section class="my-donation-summary">
+
+            <div class="festival-selector">
+                <label for="festivalYear">Festival Year</label>
+                <select id="festivalYear">
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                </select>
+            </div>
 
             <div class="summary-card">
 
@@ -151,7 +161,7 @@
     <footer>
 
         <p>
-            © 2026 Ganapathi Festival Transparency System
+            © 2026 Reddy's Youth Associations
         </p>
 
         <p>
@@ -165,6 +175,7 @@
         type="module"
         src="js/expenses.js">
     </script>
+    <script type="module" src="js/site.js"></script>
 
 </body>
 

@@ -7,7 +7,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Donations - Ganapathi Festival</title>
+    <title>Donations - Reddy's Youth Associations</title>
 
     <link rel="stylesheet" href="css/style.css">
 
@@ -21,7 +21,8 @@
     <header class="navbar">
 
         <div class="logo">
-            🕉️ Ganapathi Festival
+            <img class="brand-logo" src="assets/logo.svg" alt="Reddy's Youth Associations logo">
+            <span>Reddy's Youth Associations</span>
         </div>
 
 
@@ -145,6 +146,12 @@
 
                     </select>
 
+                    <div id="upiScanner" class="upi-scanner" hidden>
+                        <p class="upi-scanner-title">Scan to pay with UPI</p>
+                        <img id="upiScannerImage" src="" alt="Association UPI QR scanner">
+                        <p class="upi-scanner-help">After payment, submit this form. Your donation will remain pending until an admin verifies it.</p>
+                    </div>
+
 
                     <!-- FESTIVAL YEAR -->
 
@@ -193,7 +200,7 @@
     <footer>
 
         <p>
-            © 2026 Ganapathi Festival Transparency System
+            © 2026 Reddy's Youth Associations
         </p>
 
     </footer>
@@ -204,6 +211,7 @@
         type="module"
         src="js/donations.js">
     </script>
+    <script type="module" src="js/site.js"></script>
 
 </body>
 

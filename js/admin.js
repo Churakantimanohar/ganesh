@@ -10,7 +10,8 @@ import {
     where,
     getDocs,
     doc,
-    getDoc
+    getDoc,
+    setDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
@@ -45,6 +46,12 @@ const recentExpenseTable =
 
 const logoutBtn =
     document.getElementById("logoutBtn");
+
+const upiSettingsForm = document.getElementById("upiSettingsForm");
+const upiImageUrl = document.getElementById("upiImageUrl");
+const upiSettingsMessage = document.getElementById("upiSettingsMessage");
+const upiPreview = document.getElementById("upiPreview");
+const upiPreviewImage = document.getElementById("upiPreviewImage");
 
 
 // =================================
@@ -114,6 +121,7 @@ onAuthStateChanged(
 
 
             loadDashboard();
+            loadUpiSettings();
 
         } catch (error) {
 
@@ -134,6 +142,53 @@ onAuthStateChanged(
 
     }
 );
+
+async function loadUpiSettings() {
+    if (!upiSettingsForm) return;
+
+    try {
+        const snapshot = await getDoc(doc(db, "settings", "payment"));
+        const url = snapshot.exists() ? snapshot.data().upiImageUrl || "" : "";
+        upiImageUrl.value = url;
+        updateUpiPreview(url);
+    } catch (error) {
+        console.error("Error loading UPI settings:", error);
+        upiSettingsMessage.textContent = "Unable to load UPI scanner settings.";
+    }
+}
+
+function updateUpiPreview(url) {
+    upiPreview.hidden = !url;
+    if (url) {
+        upiPreviewImage.src = url;
+    } else {
+        upiPreviewImage.removeAttribute("src");
+    }
+}
+
+if (upiSettingsForm) {
+    upiSettingsForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const url = upiImageUrl.value.trim();
+
+        if (url && !/^https?:\/\//i.test(url)) {
+            upiSettingsMessage.textContent = "Enter a valid http:// or https:// image URL.";
+            return;
+        }
+
+        try {
+            await setDoc(doc(db, "settings", "payment"), {
+                upiImageUrl: url,
+                updatedAt: new Date()
+            }, { merge: true });
+            updateUpiPreview(url);
+            upiSettingsMessage.textContent = url ? "UPI scanner saved successfully." : "UPI scanner removed.";
+        } catch (error) {
+            console.error("Error saving UPI settings:", error);
+            upiSettingsMessage.textContent = "Unable to save UPI scanner settings.";
+        }
+    });
+}
 
 
 // =================================

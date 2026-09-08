@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Register - Ganapathi Transparency</title>
+    <title>Register - Reddy's Youth Associations</title>
 
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -13,7 +13,8 @@
 
     <div class="auth-container">
 
-        <h1>Ganapathi Festival</h1>
+        <img class="auth-logo" src="assets/logo.svg" alt="Reddy's Youth Associations logo">
+        <h1>Reddy's Youth Associations</h1>
         <h2>Create Account</h2>
 
         <form id="registerForm">
@@ -39,11 +40,20 @@
                 required
             >
 
+            <input
+                type="password"
+                id="confirmPassword"
+                placeholder="Confirm Password"
+                required
+            >
+
             <button type="submit">
                 Register
             </button>
 
         </form>
+
+        <button type="button" class="google-button" data-google-login data-message="message">Continue with Google</button>
 
         <p id="message"></p>
 
@@ -55,6 +65,7 @@
     </div>
 
     <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/site.js"></script>
 
 </body>
 </html>

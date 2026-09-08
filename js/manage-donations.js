@@ -13,7 +13,8 @@ import {
     getDoc,
     runTransaction,
     updateDoc,
-    setDoc
+    setDoc,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
@@ -68,6 +69,10 @@ const editDonationDate =
 const cancelEditBtn =
     document.getElementById("cancelEditBtn");
 
+const manualDonationForm = document.getElementById("manualDonationForm");
+const manualDonationMessage = document.getElementById("manualDonationMessage");
+const manualDonationDate = document.getElementById("manualDonationDate");
+
 
 // =================================
 // VARIABLES
@@ -76,6 +81,10 @@ const cancelEditBtn =
 let allDonations = [];
 
 let editingDonationId = null;
+
+if (manualDonationDate) {
+    manualDonationDate.value = new Date().toISOString().slice(0, 10);
+}
 
 
 // =================================
@@ -153,6 +162,62 @@ onAuthStateChanged(auth, async (user) => {
     }
 
 });
+
+if (manualDonationForm) {
+    manualDonationForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const donorName = document.getElementById("manualDonorName").value.trim();
+        const amount = Number(document.getElementById("manualDonationAmount").value);
+        const paymentMethod = document.getElementById("manualPaymentMethod").value;
+        const year = document.getElementById("manualFestivalYear").value;
+
+        if (!donorName || amount <= 0 || !paymentMethod || !manualDonationDate.value) {
+            manualDonationMessage.textContent = "Complete all donation details with a valid amount.";
+            return;
+        }
+
+        const donationRef = doc(collection(db, "donations"));
+        const publicDonationRef = doc(collection(db, "publicDonations"));
+        const donationDate = new Date(`${manualDonationDate.value}T00:00:00`);
+
+        try {
+            // The deployed rules require every new donation to start pending.
+            await setDoc(donationRef, {
+                donorId: auth.currentUser?.uid || "admin",
+                donorName,
+                amount,
+                paymentMethod,
+                festivalYear: year,
+                date: donationDate,
+                status: "pending",
+                source: "in-person",
+                createdAt: serverTimestamp()
+            });
+
+            // Admin verification promotes the offline receipt before publishing it.
+            await updateDoc(donationRef, { status: "confirmed" });
+
+            await setDoc(publicDonationRef, {
+                privateDonationId: donationRef.id,
+                donorName,
+                amount,
+                paymentMethod,
+                festivalYear: year,
+                date: donationDate,
+                status: "confirmed"
+            });
+
+            manualDonationMessage.textContent = "Confirmed donation added and published successfully.";
+            manualDonationForm.reset();
+            manualDonationDate.value = new Date().toISOString().slice(0, 10);
+            await loadDonations();
+        } catch (error) {
+            console.error("Error adding in-person donation:", error);
+            manualDonationMessage.textContent = "Unable to add donation. Please try again.";
+        }
+    });
+}
 
 
 // =================================

@@ -1,10 +1,7 @@
 import { auth, db } from "./firebase-config.js";
 
 
-import {
-    onAuthStateChanged,
-    signOut
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 
 import {
@@ -33,30 +30,19 @@ const logoutButton =
         "logoutButton"
     );
 
+const festivalYear = document.getElementById("festivalYear");
+
 
 
 /* ========================================
    CHECK LOGIN
 ======================================== */
 
-onAuthStateChanged(
-    auth,
-    async (user) => {
+loadExpenses(festivalYear?.value || "2026");
 
-        if (!user) {
-
-            window.location.href =
-                "login.html";
-
-            return;
-
-        }
-
-
-        await loadExpenses();
-
-    }
-);
+if (festivalYear) {
+    festivalYear.addEventListener("change", () => loadExpenses(festivalYear.value));
+}
 
 
 
@@ -64,38 +50,15 @@ onAuthStateChanged(
    LOAD EXPENSES
 ======================================== */
 
-async function loadExpenses() {
+async function loadExpenses(year) {
 
     try {
 
-        const expensesRef =
-            collection(
-                db,
-                "expenses"
-            );
-
-
-        const expensesQuery =
-            query(
-                expensesRef,
-
-                where(
-                    "festivalYear",
-                    "==",
-                    "2026"
-                ),
-
-                orderBy(
-                    "date",
-                    "desc"
-                )
-            );
-
-
-        const snapshot =
-            await getDocs(
-                expensesQuery
-            );
+        const snapshot = await getDocs(collection(db, "publicExpenses"));
+        const expenses = snapshot.docs
+            .map((documentSnapshot) => ({ id: documentSnapshot.id, ...documentSnapshot.data() }))
+            .filter((expense) => String(expense.festivalYear) === String(year))
+            .sort((a, b) => getDateValue(b.date) - getDateValue(a.date));
 
 
         tableBody.innerHTML = "";
@@ -104,7 +67,7 @@ async function loadExpenses() {
         let total = 0;
 
 
-        if (snapshot.empty) {
+        if (expenses.length === 0) {
 
             tableBody.innerHTML = `
                 <tr>
@@ -122,11 +85,8 @@ async function loadExpenses() {
         }
 
 
-        snapshot.forEach(
-            (documentSnapshot) => {
-
-                const expense =
-                    documentSnapshot.data();
+        expenses.forEach(
+            (expense) => {
 
 
                 total +=
@@ -138,16 +98,7 @@ async function loadExpenses() {
                 let date = "N/A";
 
 
-                if (expense.date) {
-
-                    date =
-                        expense.date
-                            .toDate()
-                            .toLocaleDateString(
-                                "en-IN"
-                            );
-
-                }
+                date = formatDate(expense.date);
 
 
                 const row =
@@ -163,11 +114,11 @@ async function loadExpenses() {
                     </td>
 
                     <td>
-                        ${expense.title || "N/A"}
+                        ${escapeHTML(expense.title || "N/A")}
                     </td>
 
                     <td>
-                        ${expense.category || "N/A"}
+                        ${escapeHTML(expense.category || "N/A")}
                     </td>
 
                     <td>
@@ -177,7 +128,7 @@ async function loadExpenses() {
                     </td>
 
                     <td>
-                        ${expense.description || "N/A"}
+                        ${escapeHTML(expense.description || "N/A")}
                     </td>
 
                 `;
@@ -224,7 +175,7 @@ async function loadExpenses() {
    LOGOUT
 ======================================== */
 
-logoutButton.addEventListener(
+logoutButton?.addEventListener(
     "click",
     async () => {
 
@@ -246,3 +197,21 @@ logoutButton.addEventListener(
 
     }
 );
+
+function formatDate(value) {
+    if (!value) return "N/A";
+    const date = value?.toDate ? value.toDate() : new Date(value);
+    return Number.isNaN(date.getTime()) ? "N/A" : date.toLocaleDateString("en-IN");
+}
+
+function getDateValue(value) {
+    if (!value) return 0;
+    const date = value?.toDate ? value.toDate() : new Date(value);
+    return Number.isNaN(date.getTime()) ? 0 : date.getTime();
+}
+
+function escapeHTML(value) {
+    const element = document.createElement("div");
+    element.textContent = value;
+    return element.innerHTML;
+}

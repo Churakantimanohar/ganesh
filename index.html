@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Ganapathi Festival Transparency</title>
+    <title>Reddy's Youth Associations - Ganapathi Festival</title>
 
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -16,11 +16,12 @@
     <header class="navbar">
 
         <div class="logo">
-            🕉️ Ganapathi Festival
+            <img class="brand-logo" src="assets/logo.svg" alt="Reddy's Youth Associations logo">
+            <span>Reddy's Youth Associations</span>
         </div>
 
         <nav>
-            <a href="index.html">Home</a>
+            <!-- <a href="index.html">Home</a> -->
             <a href="transparency.html">Transparency</a>
             <a href="expenses.html">Expenses</a>
             <a href="login.html">Login</a>
@@ -88,6 +89,15 @@
     <section class="summary">
 
         <h2>Festival Financial Summary</h2>
+
+        <div class="festival-selector home-festival-selector">
+            <label for="festivalYear">Festival Year</label>
+            <select id="festivalYear">
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+                <option value="2028">2028</option>
+            </select>
+        </div>
 
         <div class="summary-container">
 
@@ -191,7 +201,7 @@
     <footer>
 
         <p>
-            © 2026 Ganapathi Festival Transparency System
+            © 2026 Reddy's Youth Associations
         </p>
 
         <p>
@@ -201,6 +211,8 @@
     </footer>
 
 
+    <script type="module" src="js/transparency.js"></script>
+    <script type="module" src="js/site.js"></script>
 </body>
 
 </html>

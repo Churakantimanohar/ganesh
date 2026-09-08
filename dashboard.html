@@ -21,15 +21,16 @@
     <header class="navbar">
 
         <div class="logo">
-            🕉️ Ganapathi Festival
+            <img class="brand-logo" src="assets/logo.svg" alt="Reddy's Youth Associations logo">
+            <span>Reddy's Youth Associations</span>
         </div>
 
 
         <nav>
 
-            <a href="index.html">
+            <!-- <a href="index.html">
                 Home
-            </a>
+            </a> -->
 
             <a href="transparency.html">
                 Transparency
@@ -59,7 +60,7 @@
             </h1>
 
             <p>
-                Welcome to the Ganapathi Festival Transparency System.
+                Welcome to the Reddy's Youth Associations transparency system.
             </p>
 
         </section>
@@ -72,6 +73,15 @@
             <h2>
                 Festival Financial Summary
             </h2>
+
+            <div class="festival-selector dashboard-festival-selector">
+                <label for="festivalYear">Festival Year</label>
+                <select id="festivalYear">
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                </select>
+            </div>
 
 
             <div class="summary-container">
@@ -144,26 +154,16 @@
                         
                         </h3>
 
-                        <a href="donation-history.html" class="action-card">
-
-    <div class="action-icon">
-        📜
-    </div>
-
-    <h3>
-        My Donation History
-    </h3>
-
-    <p>
-        View all your previous donations.
-    </p>
-
-</a>
-
                     <p>
-                        View your donation history.
+                        Submit a contribution for the selected festival year.
                     </p>
 
+                </a>
+
+                <a href="donation-history.html" class="action-card">
+                    <div class="action-icon">📜</div>
+                    <h3>My Donation History</h3>
+                    <p>View all your previous donations.</p>
                 </a>
 
 
@@ -253,7 +253,7 @@
     <footer>
 
         <p>
-            © 2026 Ganapathi Festival Transparency System
+            © 2026 Reddy's Youth Associations
         </p>
 
         <p>
@@ -264,6 +264,7 @@
 
 
     <script type="module" src="js/dashboard.js"></script>
+    <script type="module" src="js/site.js"></script>
 
 </body>
 

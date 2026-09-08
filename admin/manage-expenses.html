@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Manage Expenses - Ganapathi Transparency</title>
+    <title>Manage Expenses - Reddy's Youth Associations</title>
 
     <link rel="stylesheet" href="../css/style.css">
 </head>
@@ -17,7 +17,8 @@
     <nav class="navbar">
 
         <div class="logo">
-            Ganapathi Transparency
+            <img class="brand-logo" src="../assets/logo.svg" alt="Reddy's Youth Associations logo">
+            <span>Reddy's Youth Associations</span>
         </div>
 
         <div class="nav-links">
@@ -255,7 +256,7 @@
             </div>
 
 
-            <form id="editExpenseForm">
+            <form id="editExpenseModalForm">
 
                 <input
                     type="hidden"
@@ -265,13 +266,13 @@
 
                 <div class="form-group">
 
-                    <label for="editExpenseName">
+                    <label for="modalEditExpenseName">
                         Expense Name
                     </label>
 
                     <input
                         type="text"
-                        id="editExpenseName"
+                        id="modalEditExpenseName"
                         required
                     >
 
@@ -280,12 +281,12 @@
 
                 <div class="form-group">
 
-                    <label for="editCategory">
+                    <label for="modalEditCategory">
                         Category
                     </label>
 
                     <select
-                        id="editCategory"
+                        id="modalEditCategory"
                         required
                     >
 
@@ -324,13 +325,13 @@
 
                 <div class="form-group">
 
-                    <label for="editAmount">
+                    <label for="modalEditAmount">
                         Amount (₹)
                     </label>
 
                     <input
                         type="number"
-                        id="editAmount"
+                        id="modalEditAmount"
                         min="1"
                         step="0.01"
                         required
@@ -341,12 +342,12 @@
 
                 <div class="form-group">
 
-                    <label for="editDescription">
+                    <label for="modalEditDescription">
                         Description
                     </label>
 
                     <textarea
-                        id="editDescription"
+                        id="modalEditDescription"
                         rows="4"
                     ></textarea>
 
@@ -361,7 +362,7 @@
 
                     <input
                         type="date"
-                        id="editDate"
+                        id="modalEditDate"
                         required
                     >
 
@@ -375,7 +376,7 @@
                     Save Changes
                 </button>
 
-                <p id="editMessage"></p>
+                <p id="modalEditMessage"></p>
 
             </form>
 
@@ -389,6 +390,7 @@
         type="module"
         src="../js/manage-expenses.js">
     </script>
+    <script type="module" src="../js/site.js"></script>
 
 </body>
 

@@ -10,7 +10,7 @@
         content="width=device-width, initial-scale=1.0">
 
     <title>
-        Manage Donations - Ganapathi Transparency
+        Manage Donations - Reddy's Youth Associations
     </title>
 
     <link
@@ -27,7 +27,8 @@
     <nav class="navbar">
 
         <div class="logo">
-            Ganapathi Transparency
+            <img class="brand-logo" src="../assets/logo.svg" alt="Reddy's Youth Associations logo">
+            <span>Reddy's Youth Associations</span>
         </div>
 
 
@@ -133,6 +134,47 @@
 
             </div>
 
+        </section>
+
+        <section class="dashboard-section">
+            <div class="form-card">
+                <h2>Add In-Person Donation</h2>
+                <p class="form-help">Record an offline donation received by the association. It will be confirmed and published immediately.</p>
+                <form id="manualDonationForm">
+                    <div class="form-group">
+                        <label for="manualDonorName">Donor Name</label>
+                        <input type="text" id="manualDonorName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="manualDonationAmount">Amount (₹)</label>
+                        <input type="number" id="manualDonationAmount" min="1" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="manualPaymentMethod">Payment Method</label>
+                        <select id="manualPaymentMethod" required>
+                            <option value="">Select payment method</option>
+                            <option value="Cash">Cash</option>
+                            <option value="UPI">UPI</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="manualFestivalYear">Festival Year</label>
+                        <select id="manualFestivalYear" required>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="manualDonationDate">Donation Date</label>
+                        <input type="date" id="manualDonationDate" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Add Confirmed Donation</button>
+                    <p id="manualDonationMessage" role="status" aria-live="polite"></p>
+                </form>
+            </div>
         </section>
 
 
@@ -283,6 +325,7 @@
         type="module"
         src="../js/manage-donations.js">
     </script>
+    <script type="module" src="../js/site.js"></script>
 
 </body>
 

@@ -2,9 +2,7 @@ import { db } from "./firebase-config.js";
 
 import {
   collection,
-  getDocs,
-  query,
-  where
+  getDocs
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
@@ -34,12 +32,7 @@ async function loadTransparency(year) {
     // LOAD PUBLIC DONATIONS
     // ===============================
 
-    const donationsQuery = query(
-      collection(db, "publicDonations"),
-      where("festivalYear", "==", year)
-    );
-
-    const donationsSnapshot = await getDocs(donationsQuery);
+    const donationsSnapshot = await getDocs(collection(db, "publicDonations"));
 
     let donationTotal = 0;
 
@@ -48,6 +41,9 @@ async function loadTransparency(year) {
     donationsSnapshot.forEach((doc) => {
 
       const data = doc.data();
+
+      if (String(data.festivalYear) !== String(year)) return;
+      if (data.status && data.status !== "confirmed") return;
 
       donationTotal += Number(data.amount || 0);
 
@@ -63,12 +59,7 @@ async function loadTransparency(year) {
     // LOAD PUBLIC EXPENSES
     // ===============================
 
-    const expensesQuery = query(
-      collection(db, "publicExpenses"),
-      where("festivalYear", "==", year)
-    );
-
-    const expensesSnapshot = await getDocs(expensesQuery);
+    const expensesSnapshot = await getDocs(collection(db, "publicExpenses"));
 
     let expenseTotal = 0;
 
@@ -77,6 +68,8 @@ async function loadTransparency(year) {
     expensesSnapshot.forEach((doc) => {
 
       const data = doc.data();
+
+      if (String(data.festivalYear) !== String(year)) return;
 
       expenseTotal += Number(data.amount || 0);
 
@@ -99,14 +92,9 @@ async function loadTransparency(year) {
     // DISPLAY SUMMARY
     // ===============================
 
-    totalDonations.textContent =
-      formatCurrency(donationTotal);
-
-    totalExpenses.textContent =
-      formatCurrency(expenseTotal);
-
-    remainingBalance.textContent =
-      formatCurrency(balance);
+    if (totalDonations) totalDonations.textContent = formatCurrency(donationTotal);
+    if (totalExpenses) totalExpenses.textContent = formatCurrency(expenseTotal);
+    if (remainingBalance) remainingBalance.textContent = formatCurrency(balance);
 
 
     // ===============================
@@ -140,6 +128,8 @@ async function loadTransparency(year) {
     // ===============================
     // DISPLAY DONATIONS
     // ===============================
+
+    if (!donationsTable) return;
 
     if (donations.length === 0) {
 
@@ -185,6 +175,8 @@ async function loadTransparency(year) {
     // ===============================
     // DISPLAY EXPENSES
     // ===============================
+
+    if (!expensesTable) return;
 
     if (expenses.length === 0) {
 
@@ -234,11 +226,11 @@ async function loadTransparency(year) {
 
     console.error("Error loading transparency:", error);
 
-    totalDonations.textContent = "₹0.00";
-    totalExpenses.textContent = "₹0.00";
-    remainingBalance.textContent = "₹0.00";
+    if (totalDonations) totalDonations.textContent = "₹0.00";
+    if (totalExpenses) totalExpenses.textContent = "₹0.00";
+    if (remainingBalance) remainingBalance.textContent = "₹0.00";
 
-    donationsTable.innerHTML = `
+    if (donationsTable) donationsTable.innerHTML = `
       <tr>
         <td colspan="4">
           Unable to load donations.
@@ -246,7 +238,7 @@ async function loadTransparency(year) {
       </tr>
     `;
 
-    expensesTable.innerHTML = `
+    if (expensesTable) expensesTable.innerHTML = `
       <tr>
         <td colspan="5">
           Unable to load expenses.
@@ -263,11 +255,11 @@ async function loadTransparency(year) {
 // FESTIVAL YEAR CHANGE
 // ===============================
 
-festivalYear.addEventListener("change", () => {
+if (festivalYear) {
+  festivalYear.addEventListener("change", () => loadTransparency(festivalYear.value));
+}
 
-  loadTransparency(festivalYear.value);
-
-});
+loadTransparency(festivalYear?.value || "2026");
 
 
 // ===============================
@@ -360,10 +352,3 @@ function escapeHTML(value) {
   return div.innerHTML;
 
 }
-
-
-// ===============================
-// INITIAL LOAD
-// ===============================
-
-loadTransparency(festivalYear.value);
