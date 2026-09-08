@@ -1,4 +1,5 @@
 const adminArea = window.location.pathname.includes("/admin/");
+const transparencyPage = document.body.classList.contains("transparency-page");
 const root = adminArea ? "../" : "";
 let navbar = document.querySelector(".navbar");
 
@@ -28,7 +29,7 @@ if (navbar) {
 
     const navigation = adminArea
         ? `${link("admin/dashboard.html", "Dashboard")}${link("admin/manage-donations.html", "Manage Donations")}${link("admin/expenses.html", "Add Expense")}${link("admin/manage-expenses.html", "Manage Expenses")}${link("transparency.html", "Transparency")}<button type="button" class="site-logout nav-button">Logout</button>`
-        : `${link("index.html", "Home")}${link("transparency.html", "Transparency")}<span class="authenticated-links" hidden>${link("dashboard.html", "Dashboard")}${link("donations.html", "Donations")}${link("donation-history.html", "Donation History")}${link("expenses.html", "Expenses")}</span><a class="guest-link" href="${root}login.html">Login</a><a class="guest-link nav-button" href="${root}register.html">Register</a><button type="button" class="site-logout nav-button authenticated-links" hidden>Logout</button>`;
+        : `${transparencyPage ? "" : link("index.html", "Home")}${link("transparency.html", "Transparency")}<span class="authenticated-links" hidden>${link("dashboard.html", "Dashboard")}${link("donations.html", "Donations")}${link("donation-history.html", "Donation History")}${link("expenses.html", "Expenses")}</span><a class="guest-link" href="${root}login.html">Login</a><a class="guest-link nav-button" href="${root}register.html">Register</a><button type="button" class="site-logout nav-button authenticated-links" hidden>Logout</button>`;
 
     if (!navbar.querySelector(".logo")) {
         navbar.insertAdjacentHTML(
@@ -53,7 +54,7 @@ if (navbar) {
 }
 
 const footer = document.querySelector("footer") || document.body.appendChild(document.createElement("footer"));
-footer.innerHTML = `<div class="footer-brand"><img src="${root}assets/club-emblem.png" alt="Reddy's Youth Associations club emblem"><div><strong>Reddy's Youth Associations</strong><span>Ganapathi Festival transparency information</span></div></div><nav class="footer-links">${link("index.html", "Home")}${link("transparency.html", "Transparency")}${link("login.html", "Login")}</nav><small>&copy; ${new Date().getFullYear()} Reddy's Youth Associations</small>`;
+footer.innerHTML = `<div class="footer-brand"><img src="${root}assets/club-emblem.png" alt="Reddy's Youth Associations club emblem"><div><strong>Reddy's Youth Associations</strong><span>Ganapathi Festival transparency information</span></div></div><nav class="footer-links">${transparencyPage ? "" : link("index.html", "Home")}${link("transparency.html", "Transparency")}${link("login.html", "Login")}</nav><small>&copy; ${new Date().getFullYear()} Reddy's Youth Associations</small>`;
 
 import("./firebase-config.js").then(async ({ auth, db }) => {
     const { onAuthStateChanged, signOut } = await import("https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js");

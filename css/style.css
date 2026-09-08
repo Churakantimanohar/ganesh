@@ -1634,6 +1634,17 @@ tr:last-child td {
     gap: 20px;
 }
 
+.admin-dashboard .dashboard-summary-section {
+    padding-top: 30px;
+    padding-bottom: 0;
+}
+
+.admin-dashboard .dashboard-summary-section .summary-cards {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
 
 .admin-dashboard .summary-card {
     background: white;
