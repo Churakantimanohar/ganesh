@@ -1,127 +1,75 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Migrate Expenses - Reddy's Youth Associations</title>
 
-    <link rel="stylesheet" href="../css/style.css">
-</head>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
 
-<body>
-
+  <body>
     <nav class="navbar">
-
-        <div class="nav-container">
-
-            <div class="logo">
-                <img class="brand-logo" src="../assets/logo.svg" alt="Reddy's Youth Associations logo">
-                <span>Reddy's Youth Associations</span>
-            </div>
-
-            <div class="nav-links">
-
-                <a href="dashboard.html">
-                    Admin Dashboard
-                </a>
-
-                <a href="expenses.html">
-                    Add Expense
-                </a>
-
-                <a href="manage-expenses.html">
-                    Manage Expenses
-                </a>
-
-                <a href="manage-donations.html">
-                    Manage Donations
-                </a>
-
-                <a href="../transparency.html">
-                    Transparency
-                </a>
-
-                <a href="#" id="logoutBtn">
-                    Logout
-                </a>
-
-            </div>
-
+      <div class="nav-container">
+        <div class="logo">
+          <img
+            class="brand-logo"
+            src="../assets/logo.svg"
+            alt="Reddy's Youth Associations logo"
+          />
+          <span>Reddy's Youth Associations</span>
         </div>
 
+        <div class="nav-links">
+          <a href="dashboard.html"> Admin Dashboard </a>
+
+          <a href="expenses.html"> Add Expense </a>
+
+          <a href="manage-expenses.html"> Manage Expenses </a>
+
+          <a href="manage-donations.html"> Manage Donations </a>
+
+          <a href="../transparency.html"> Transparency </a>
+
+          <a href="#" id="logoutBtn"> Logout </a>
+        </div>
+      </div>
     </nav>
 
-
     <main class="dashboard-container">
+      <section class="dashboard-header">
+        <h1>Publish Existing Expenses</h1>
 
-        <section class="dashboard-header">
+        <p>
+          Copy existing festival expenses to the public transparency records.
+        </p>
+      </section>
 
-            <h1>
-                Publish Existing Expenses
-            </h1>
+      <section class="dashboard-section">
+        <div class="form-card">
+          <div class="form-group">
+            <label for="festivalYear"> Festival Year </label>
 
-            <p>
-                Copy existing festival expenses to the public transparency records.
-            </p>
+            <select id="festivalYear">
+              <option value="2026">2026</option>
 
-        </section>
+              <option value="2027">2027</option>
 
+              <option value="2028">2028</option>
+            </select>
+          </div>
 
-        <section class="dashboard-section">
+          <button id="migrateBtn" class="btn-primary" type="button">
+            Publish Expenses
+          </button>
 
-            <div class="form-card">
-
-                <div class="form-group">
-
-                    <label for="festivalYear">
-                        Festival Year
-                    </label>
-
-                    <select id="festivalYear">
-
-                        <option value="2026">
-                            2026
-                        </option>
-
-                        <option value="2027">
-                            2027
-                        </option>
-
-                        <option value="2028">
-                            2028
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <button
-                    id="migrateBtn"
-                    class="btn-primary"
-                    type="button"
-                >
-                    Publish Expenses
-                </button>
-
-
-                <p id="message"></p>
-
-            </div>
-
-        </section>
-
+          <p id="message"></p>
+        </div>
+      </section>
     </main>
 
-
-    <script
-        type="module"
-        src="../js/migrate-expenses.js">
-    </script>
+    <script type="module" src="../js/migrate-expenses.js"></script>
     <script type="module" src="../js/site.js"></script>
-
-</body>
-
+  </body>
 </html>

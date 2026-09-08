@@ -1,405 +1,228 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Admin Dashboard - Reddy's Youth Associations</title>
 
-    <link rel="stylesheet" href="../css/style.css">
-</head>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
 
-<body>
-
+  <body>
     <!-- Navigation -->
     <nav class="navbar">
-        <div class="nav-container">
-
-            <div class="logo">
-                <img class="brand-logo" src="../assets/logo.svg" alt="Reddy's Youth Associations logo">
-                <span>Reddy's Youth Associations</span>
-            </div>
-
-            <div class="nav-links">
-
-                <a href="dashboard.html" aria-current="page">
-                    Dashboard
-                </a>
-
-                <a href="expenses.html">
-                    Add Expense
-                </a>
-
-                <a href="manage-expenses.html">
-                    Manage Expenses
-                </a>
-
-                <a href="manage-donations.html">
-                    Manage Donations
-                </a>
-
-                <a href="../transparency.html">
-                    Transparency
-                </a>
-
-                <a href="#" id="logoutBtn">
-                    Logout
-                </a>
-
-            </div>
-
+      <div class="nav-container">
+        <div class="logo">
+          <img
+            class="brand-logo"
+            src="../assets/logo.svg"
+            alt="Reddy's Youth Associations logo"
+          />
+          <span>Reddy's Youth Associations</span>
         </div>
-    </nav>
 
+        <div class="nav-links">
+          <a href="dashboard.html" aria-current="page"> Dashboard </a>
+
+          <a href="expenses.html"> Add Expense </a>
+
+          <a href="manage-expenses.html"> Manage Expenses </a>
+
+          <a href="manage-donations.html"> Manage Donations </a>
+
+          <a href="../transparency.html"> Transparency </a>
+
+          <a href="#" id="logoutBtn"> Logout </a>
+        </div>
+      </div>
+    </nav>
 
     <!-- Main Content -->
     <main class="dashboard-container admin-dashboard">
-
-    <div class="dashboard-header">
-
+      <div class="dashboard-header">
         <div>
-            <h1>Admin Dashboard</h1>
+          <h1>Admin Dashboard</h1>
 
-            <p>
-                Reddy's Youth Associations Financial Overview
-            </p>
+          <p>Reddy's Youth Associations Financial Overview</p>
         </div>
-
 
         <div class="year-selector">
+          <label for="festivalYear"> Festival Year </label>
 
-            <label for="festivalYear">
-                Festival Year
-            </label>
+          <select id="festivalYear">
+            <option value="2026">2026</option>
 
-            <select id="festivalYear">
+            <option value="2027">2027</option>
 
-                <option value="2026">
-                    2026
-                </option>
-
-                <option value="2027">
-                    2027
-                </option>
-
-                <option value="2028">
-                    2028
-                </option>
-
-            </select>
-
+            <option value="2028">2028</option>
+          </select>
         </div>
+      </div>
 
-    </div>
+      <!-- ========================= -->
+      <!-- SUMMARY CARDS -->
+      <!-- ========================= -->
 
+      <section class="dashboard-section dashboard-summary-section">
+        <div class="summary-cards">
+          <div class="summary-card">
+            <h3>Verified Donations</h3>
 
-    <!-- ========================= -->
-    <!-- SUMMARY CARDS -->
-    <!-- ========================= -->
+            <p id="totalDonations">₹0.00</p>
+          </div>
 
-    <section class="dashboard-section dashboard-summary-section">
+          <div class="summary-card">
+            <h3>Total Expenses</h3>
 
-    <div class="summary-cards">
+            <p id="totalExpenses">₹0.00</p>
+          </div>
 
+          <div class="summary-card">
+            <h3>Remaining Balance</h3>
 
-        <div class="summary-card">
+            <p id="remainingBalance">₹0.00</p>
+          </div>
 
-            <h3>
-                Verified Donations
-            </h3>
+          <div class="summary-card">
+            <h3>Pending Donations</h3>
 
-            <p id="totalDonations">
-                ₹0.00
-            </p>
-
+            <p id="pendingDonations">₹0.00</p>
+          </div>
         </div>
+      </section>
 
+      <!-- ========================= -->
+      <!-- QUICK ACTIONS -->
+      <!-- ========================= -->
 
-        <div class="summary-card">
-
-            <h3>
-                Total Expenses
-            </h3>
-
-            <p id="totalExpenses">
-                ₹0.00
-            </p>
-
-        </div>
-
-
-        <div class="summary-card">
-
-            <h3>
-                Remaining Balance
-            </h3>
-
-            <p id="remainingBalance">
-                ₹0.00
-            </p>
-
-        </div>
-
-
-        <div class="summary-card">
-
-            <h3>
-                Pending Donations
-            </h3>
-
-            <p id="pendingDonations">
-                ₹0.00
-            </p>
-
-        </div>
-
-    </div>
-
-    </section>
-
-
-    <!-- ========================= -->
-    <!-- QUICK ACTIONS -->
-    <!-- ========================= -->
-
-    <section class="dashboard-section">
-
-        <h2>
-            Quick Actions
-        </h2>
-
+      <section class="dashboard-section">
+        <h2>Quick Actions</h2>
 
         <div class="action-grid">
+          <a href="expenses.html" class="action-card">
+            <div class="action-icon">➕</div>
 
+            <h3>Add Expense</h3>
 
-            <a
-                href="expenses.html"
-                class="action-card">
+            <p>Record a new festival expense.</p>
+          </a>
 
-                <div class="action-icon">
-                    ➕
-                </div>
+          <a href="manage-expenses.html" class="action-card">
+            <div class="action-icon">✏️</div>
 
-                <h3>
-                    Add Expense
-                </h3>
+            <h3>Manage Expenses</h3>
 
-                <p>
-                    Record a new festival expense.
-                </p>
+            <p>Edit or delete expenses.</p>
+          </a>
 
-            </a>
+          <a href="manage-donations.html" class="action-card">
+            <div class="action-icon">💰</div>
 
+            <h3>Manage Donations</h3>
 
-            <a
-                href="manage-expenses.html"
-                class="action-card">
+            <p>Verify and manage donations.</p>
+          </a>
 
-                <div class="action-icon">
-                    ✏️
-                </div>
+          <a href="../transparency.html" class="action-card">
+            <div class="action-icon">📊</div>
 
-                <h3>
-                    Manage Expenses
-                </h3>
+            <h3>Transparency</h3>
 
-                <p>
-                    Edit or delete expenses.
-                </p>
-
-            </a>
-
-
-            <a
-                href="manage-donations.html"
-                class="action-card">
-
-                <div class="action-icon">
-                    💰
-                </div>
-
-                <h3>
-                    Manage Donations
-                </h3>
-
-                <p>
-                    Verify and manage donations.
-                </p>
-
-            </a>
-
-
-            <a
-                href="../transparency.html"
-                class="action-card">
-
-                <div class="action-icon">
-                    📊
-                </div>
-
-                <h3>
-                    Transparency
-                </h3>
-
-                <p>
-                    View the public financial report.
-                </p>
-
-            </a>
-
+            <p>View the public financial report.</p>
+          </a>
         </div>
+      </section>
 
-    </section>
-
-    <section class="dashboard-section">
+      <section class="dashboard-section">
         <div class="form-card upi-settings-card">
-            <h2>UPI Donation Scanner</h2>
-            <p class="form-help">Save the hosted QR image URL shown to donors when they choose UPI.</p>
-            <form id="upiSettingsForm">
-                <div class="form-group">
-                    <label for="upiImageUrl">UPI QR Image URL</label>
-                    <input type="url" id="upiImageUrl" placeholder="https://example.com/upi-qr.png" autocomplete="url">
-                </div>
-                <button type="submit" class="btn-primary">Save UPI Scanner</button>
-                <p id="upiSettingsMessage" role="status" aria-live="polite"></p>
-            </form>
-            <div id="upiPreview" class="upi-preview" hidden>
-                <span>Current scanner preview</span>
-                <img id="upiPreviewImage" src="" alt="UPI QR scanner preview">
+          <h2>UPI Donation Scanner</h2>
+          <p class="form-help">
+            Save the hosted QR image URL shown to donors when they choose UPI.
+          </p>
+          <form id="upiSettingsForm">
+            <div class="form-group">
+              <label for="upiImageUrl">UPI QR Image URL</label>
+              <input
+                type="url"
+                id="upiImageUrl"
+                placeholder="https://example.com/upi-qr.png"
+                autocomplete="url"
+              />
             </div>
+            <button type="submit" class="btn-primary">Save UPI Scanner</button>
+            <p id="upiSettingsMessage" role="status" aria-live="polite"></p>
+          </form>
+          <div id="upiPreview" class="upi-preview" hidden>
+            <span>Current scanner preview</span>
+            <img id="upiPreviewImage" src="" alt="UPI QR scanner preview" />
+          </div>
         </div>
-    </section>
+      </section>
 
+      <!-- ========================= -->
+      <!-- RECENT DONATIONS -->
+      <!-- ========================= -->
 
-    <!-- ========================= -->
-    <!-- RECENT DONATIONS -->
-    <!-- ========================= -->
-
-    <section class="dashboard-section">
-
+      <section class="dashboard-section">
         <div class="section-header">
+          <h2>Recent Donations</h2>
 
-            <h2>
-                Recent Donations
-            </h2>
-
-            <a href="manage-donations.html">
-                View All
-            </a>
-
+          <a href="manage-donations.html"> View All </a>
         </div>
-
 
         <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
 
-            <table>
+                <th>Donor</th>
 
-                <thead>
+                <th>Amount</th>
 
-                    <tr>
+                <th>Status</th>
+              </tr>
+            </thead>
 
-                        <th>
-                            Date
-                        </th>
-
-                        <th>
-                            Donor
-                        </th>
-
-                        <th>
-                            Amount
-                        </th>
-
-                        <th>
-                            Status
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody id="recentDonationTable">
-
-                </tbody>
-
-            </table>
-
+            <tbody id="recentDonationTable"></tbody>
+          </table>
         </div>
+      </section>
 
-    </section>
+      <!-- ========================= -->
+      <!-- RECENT EXPENSES -->
+      <!-- ========================= -->
 
-
-    <!-- ========================= -->
-    <!-- RECENT EXPENSES -->
-    <!-- ========================= -->
-
-    <section class="dashboard-section">
-
+      <section class="dashboard-section">
         <div class="section-header">
+          <h2>Recent Expenses</h2>
 
-            <h2>
-                Recent Expenses
-            </h2>
-
-            <a href="manage-expenses.html">
-                View All
-            </a>
-
+          <a href="manage-expenses.html"> View All </a>
         </div>
-
 
         <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
 
-            <table>
+                <th>Expense</th>
 
-                <thead>
+                <th>Category</th>
 
-                    <tr>
+                <th>Amount</th>
+              </tr>
+            </thead>
 
-                        <th>
-                            Date
-                        </th>
-
-                        <th>
-                            Expense
-                        </th>
-
-                        <th>
-                            Category
-                        </th>
-
-                        <th>
-                            Amount
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody id="recentExpenseTable">
-
-                </tbody>
-
-            </table>
-
+            <tbody id="recentExpenseTable"></tbody>
+          </table>
         </div>
-
-    </section>
-
-</main>
+      </section>
+    </main>
 
     <!-- JavaScript -->
-    <script
-        type="module"
-        src="../js/admin.js">
-    </script>
+    <script type="module" src="../js/admin.js"></script>
     <script type="module" src="../js/site.js"></script>
-
-</body>
-
+  </body>
 </html>
-
